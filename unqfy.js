@@ -18,8 +18,10 @@ class UNQfy {
     constructor() {
         this.artistList = [];
         this.listPlayList = [];
-        this.nextIdArtist = 1;
-        this.nextIdPlayList = 1;
+        this.nextIdArtist = 0;
+        this.nextIdPlayList = 0;
+        this.nextIdTrack = 0;
+        this.nextIdAlbum = 0;
     }
 
     // artistData: objeto JS con los datos necesarios para crear un artista
@@ -66,7 +68,8 @@ class UNQfy {
     // retorna: el nuevo track creado
     addTrack(albumId, trackData) {
         const album = this.getAlbumById(albumId);
-        const track = new Track(trackData);
+        const track = new Track(trackData, this.nextIdTrack);
+        this.nextIdTrack ++;
         album.addTrack(track);
         return track;
         /* Crea un track y lo agrega al album con id albumId.
