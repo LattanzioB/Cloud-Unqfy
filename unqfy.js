@@ -4,11 +4,14 @@ const { Artist } = require('./Models/Artist');
 const { Album } = require('./Models/Album');
 const { Track } = require('./Models/Track');
 const { Playlist } = require('./Models/Playlist');
-const { ErrorNoExistentArtist } = require('./Models/Errors');
+const { ErrorNoExisteAlbum, ErrorNoExisteArtist } = require('./Models/Errors');
 const { flatMap } = require('lodash');
 
 class Handler {
     handleAlbumError() {
+        console.log("El Album no existe")
+    }
+    handleArtistError() {
         console.log("El Artista no existe")
     }
 }
@@ -50,7 +53,8 @@ class UNQfy {
     addAlbum(artistId, albumData) {
         const artist = this.getArtistById(artistId);
         //console.log(artist);
-        const newAlbum = new Album(albumData);
+        const newAlbum = new Album(albumData, this.nextIdAlbum);
+        this.nextIdAlbum ++;
         artist.addAlbum(newAlbum);
         return newAlbum;
         /* Crea un album y lo agrega al artista con id artistId.
@@ -86,10 +90,10 @@ class UNQfy {
 
     getAlbumById(id) {
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
-
+        
         try {
             if (artistAlbum == undefined) {
-                throw new ErrorNoExistentArtist;
+                throw new ErrorNoExisteAlbum;
             } else {
                 //console.log(artistAlbum.searchAlbum(id));
                 return (artistAlbum.searchAlbum(id));
@@ -117,9 +121,30 @@ class UNQfy {
 
     }
 
+
     // artistName: nombre de artista(string)
     // retorna: los tracks interpredatos por el artista con nombre artistName
-    getTracksMatchingArtist(artistName) {}
+    getArtistByName(artistName){
+        const artist = this.artistList.find(artist => artist.name == artistName);
+        
+        try {
+            if (artist == undefined) {
+                throw new ErrorNoExisteArtist;
+            } else {
+                return (artist);
+            }
+        } catch (e) {
+            e.handle(new Handler())
+        }
+    }
+    
+    
+    getTracksMatchingArtist(artistName) {
+        const artist = this.getArtistByName(artistName.name);
+        const albums = artist.albums;
+        const artistracks = flatMap(albums, album => album.tracks);
+        return artistracks;
+    }
 
 
     // name: nombre de la playlist
@@ -133,11 +158,28 @@ class UNQfy {
             * un metodo duration() que retorne la duración de la playlist.
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
-        const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration);
+        const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
+        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, maxDuration);
+        const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
         this.listPlayList.push(playlist);
         return playlist;
+    }
 
+    limitTracklistTime(trackList, time){
+        let res = trackList;
+        while (this.trackListDuration(trackList) > time){
+            res.slice(0,-1);
+        }
+        return res;
+    }
+
+    trackListDuration(trackList){
+        let res = 0;
+        trackList.forEach(track => {
+            res += track.duration;
+        });
+        return res;
     }
 
     findAllArtistByName(name) {
@@ -146,10 +188,6 @@ class UNQfy {
 
     findAllAlbums() {
         return flatMap(this.artistList, artist => artist.albums);
-    }
-
-    findAllAlbumsByName(name) {
-        return this.findAllAlbums().filter(album => album.name.includes(name));
     }
 
     findAllAlbumsByName(name) {

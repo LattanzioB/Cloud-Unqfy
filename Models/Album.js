@@ -1,5 +1,5 @@
 class Album {
-    constructor({ id, name, year }) {
+    constructor({name, year }, id) {
         this._id = id;
         this._name = name;
         this._year = year;

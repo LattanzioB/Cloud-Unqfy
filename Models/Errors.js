@@ -1,9 +1,16 @@
-class ErrorNoExistentArtist extends Error {
+class ErrorNoExisteAlbum extends Error {
     handle(x) {
         x.handleAlbumError()
     }
 }
 
+class ErrorNoExisteArtist extends Error {
+    handle(x) {
+        x.handleAristError()
+    }
+}
+
 module.exports = {
-    ErrorNoExistentArtist
+    ErrorNoExisteAlbum,
+    ErrorNoExisteArtist
 };
