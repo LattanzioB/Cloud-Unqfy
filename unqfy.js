@@ -85,7 +85,18 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        return this.artistList.find(artist => artist.id == id)
+        const artist =  this.artistList.find(artist => artist.id == id)
+
+        try {
+            if (artist == undefined) {
+                throw new ErrorNoExisteArtist;
+            } else {
+                //console.log(artistAlbum.searchAlbum(id));
+                return (artist);
+            }
+        } catch (e) {
+            e.handle(new Handler())
+        }
     }
 
     getAlbumById(id) {
@@ -126,7 +137,6 @@ class UNQfy {
     // retorna: los tracks interpredatos por el artista con nombre artistName
     getArtistByName(artistName){
         const artist = this.artistList.find(artist => artist.name == artistName);
-        
         try {
             if (artist == undefined) {
                 throw new ErrorNoExisteArtist;
@@ -134,7 +144,7 @@ class UNQfy {
                 return (artist);
             }
         } catch (e) {
-            e.handle(new Handler())
+            e.handle(new Handler());
         }
     }
     
@@ -169,7 +179,7 @@ class UNQfy {
     limitTracklistTime(trackList, time){
         let res = trackList;
         while (this.trackListDuration(trackList) > time){
-            res.slice(0,-1);
+            res.slice(0,-1); //Saca el ultimo elemento de la lista
         }
         return res;
     }
