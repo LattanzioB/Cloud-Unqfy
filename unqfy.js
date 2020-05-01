@@ -54,7 +54,7 @@ class UNQfy {
         const artist = this.getArtistById(artistId);
         //console.log(artist);
         const newAlbum = new Album(albumData, this.nextIdAlbum);
-        this.nextIdAlbum ++;
+        this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
         return newAlbum;
         /* Crea un album y lo agrega al artista con id artistId.
@@ -73,7 +73,7 @@ class UNQfy {
     addTrack(albumId, trackData) {
         const album = this.getAlbumById(albumId);
         const track = new Track(trackData, this.nextIdTrack);
-        this.nextIdTrack ++;
+        this.nextIdTrack++;
         album.addTrack(track);
         return track;
         /* Crea un track y lo agrega al album con id albumId.
@@ -85,7 +85,7 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        const artist =  this.artistList.find(artist => artist.id == id)
+        const artist = this.artistList.find(artist => artist.id == id)
 
         try {
             if (artist == undefined) {
@@ -101,7 +101,7 @@ class UNQfy {
 
     getAlbumById(id) {
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
-        
+
         try {
             if (artistAlbum == undefined) {
                 throw new ErrorNoExisteAlbum;
@@ -135,7 +135,7 @@ class UNQfy {
 
     // artistName: nombre de artista(string)
     // retorna: los tracks interpredatos por el artista con nombre artistName
-    getArtistByName(artistName){
+    getArtistByName(artistName) {
         const artist = this.artistList.find(artist => artist.name == artistName);
         try {
             if (artist == undefined) {
@@ -147,8 +147,8 @@ class UNQfy {
             e.handle(new Handler());
         }
     }
-    
-    
+
+
     getTracksMatchingArtist(artistName) {
         const artist = this.getArtistByName(artistName.name);
         const albums = artist.albums;
@@ -169,22 +169,30 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
-        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, maxDuration);
+        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400)
+
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
         this.listPlayList.push(playlist);
         return playlist;
     }
 
-    limitTracklistTime(trackList, time){
+    limitTracklistTime(trackList, time) {
         let res = trackList;
-        while (this.trackListDuration(trackList) > time){
-            res.slice(0,-1); //Saca el ultimo elemento de la lista
+        let trackFinal = []
+
+        while (res.length != 0) {
+            if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
+                trackFinal.push(res.pop())
+            } else {
+                res.pop()
+            }
         }
-        return res;
+        //console.log(trackFinal);
+        return trackFinal;
     }
 
-    trackListDuration(trackList){
+    trackListDuration(trackList) {
         let res = 0;
         trackList.forEach(track => {
             res += track.duration;
