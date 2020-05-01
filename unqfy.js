@@ -4,17 +4,15 @@ const { Artist } = require('./Models/Artist');
 const { Album } = require('./Models/Album');
 const { Track } = require('./Models/Track');
 const { Playlist } = require('./Models/Playlist');
-const { ErrorNoExisteAlbum, ErrorNoExisteArtist } = require('./Models/Errors');
 const { flatMap } = require('lodash');
-
-class Handler {
-    handleAlbumError() {
-        console.log("El Album no existe")
-    }
-    handleArtistError() {
-        console.log("El Artista no existe")
-    }
-}
+const {
+    ErrorArtistaRepetido,
+    ErrorNoExisteArtist,
+    ErrorTrackRepetido,
+    ErrorNoExisteAlbum,
+    ErrorNoExisteTrack,
+    ErrorAlbumRepetido,
+} = require('./Models/Errors');
 
 class UNQfy {
 
@@ -32,6 +30,11 @@ class UNQfy {
     //   artistData.country (string)
     // retorna: el nuevo artista creado
     addArtist(artistData) {
+        const checkArtist = this.artistList.find(artist => artist.name === artistData.name)
+
+        if (checkArtist) {
+            throw new ErrorArtistaRepetido()
+        }
         let newArtist = new Artist(artistData.name, artistData.country, this.nextIdArtist);
         this.artistList.push(newArtist)
         this.nextIdArtist++;
@@ -51,10 +54,14 @@ class UNQfy {
     //   albumData.year (number)
     // retorna: el nuevo album creado
     addAlbum(artistId, albumData) {
+        const checkAlbum = this.findAllAlbums().find(album => album.name === name);
+        if (checkAlbum) {
+            throw new ErrorAlbumRepetido()
+        }
+
         const artist = this.getArtistById(artistId);
-        //console.log(artist);
         const newAlbum = new Album(albumData, this.nextIdAlbum);
-        this.nextIdAlbum ++;
+        this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
         return newAlbum;
         /* Crea un album y lo agrega al artista con id artistId.
@@ -71,9 +78,14 @@ class UNQfy {
     //   trackData.genres (lista de strings)
     // retorna: el nuevo track creado
     addTrack(albumId, trackData) {
+        const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(track => track.name === name);
+        if (checkTrack) {
+            throw new ErrorTrackRepetido()
+        }
+
         const album = this.getAlbumById(albumId);
         const track = new Track(trackData, this.nextIdTrack);
-        this.nextIdTrack ++;
+        this.nextIdTrack++;
         album.addTrack(track);
         return track;
         /* Crea un track y lo agrega al album con id albumId.
@@ -85,37 +97,43 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        const artist =  this.artistList.find(artist => artist.id == id)
-
-        try {
-            if (artist == undefined) {
-                throw new ErrorNoExisteArtist;
-            } else {
-                //console.log(artistAlbum.searchAlbum(id));
-                return (artist);
-            }
-        } catch (e) {
-            e.handle(new Handler())
+        const artist = this.artistList.find(artist => artist.id === id)
+        if (!artist) {
+            throw new ErrorArtistaInexistente;
         }
+        return artist
     }
 
     getAlbumById(id) {
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
-        
-        try {
-            if (artistAlbum == undefined) {
-                throw new ErrorNoExisteAlbum;
-            } else {
-                //console.log(artistAlbum.searchAlbum(id));
-                return (artistAlbum.searchAlbum(id));
-            }
-        } catch (e) {
-            e.handle(new Handler())
-        }
+        const album = artistAlbum.searchAlbum(id);
+        if (!album) {
+            throw new ErrorNoExisteAlbum;
+        } //console.log(artistAlbum.searchAlbum(id));
+
+        return (artistAlbum.searchAlbum(id));
+    }
+
+    deleteArtist(id) {
+        this.artistList = this.artistList.filter(artist => artist.id !== id)
+    }
+
+    deleteAlbum(id) {
+        this.artistList.forEach(artist => artist.deleteAlbum(id));
+    }
+
+    deleteTrack(id) {
+        this.listaDeArtistas.forEach(artist => artist.searchAndDeleteTracks(id));
     }
 
     getTrackById(id) {
-
+        const artist = this.artistList.find(artist => artist.searchTrack(id));
+        const album = artist.searchTrack(id);
+        const track = album.searchTrack(id);
+        if (!track) {
+            throw new ErrorNoExisteTrack;
+        }
+        return track;
     }
 
     getPlaylistById(id) {
@@ -135,20 +153,15 @@ class UNQfy {
 
     // artistName: nombre de artista(string)
     // retorna: los tracks interpredatos por el artista con nombre artistName
-    getArtistByName(artistName){
+    getArtistByName(artistName) {
         const artist = this.artistList.find(artist => artist.name == artistName);
-        try {
-            if (artist == undefined) {
-                throw new ErrorNoExisteArtist;
-            } else {
-                return (artist);
-            }
-        } catch (e) {
-            e.handle(new Handler());
+        if (artist == undefined) {
+            throw new ErrorNoExisteArtist;
         }
+        return artist
     }
-    
-    
+
+
     getTracksMatchingArtist(artistName) {
         const artist = this.getArtistByName(artistName.name);
         const albums = artist.albums;
@@ -169,22 +182,30 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
-        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, maxDuration);
+        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400)
+
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
         this.listPlayList.push(playlist);
         return playlist;
     }
 
-    limitTracklistTime(trackList, time){
+    limitTracklistTime(trackList, time) {
         let res = trackList;
-        while (this.trackListDuration(trackList) > time){
-            res.slice(0,-1); //Saca el ultimo elemento de la lista
+        let trackFinal = []
+
+        while (res.length != 0) {
+            if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
+                trackFinal.push(res.pop())
+            } else {
+                res.pop()
+            }
         }
-        return res;
+        //console.log(trackFinal);
+        return trackFinal;
     }
 
-    trackListDuration(trackList){
+    trackListDuration(trackList) {
         let res = 0;
         trackList.forEach(track => {
             res += track.duration;
@@ -235,7 +256,7 @@ class UNQfy {
     static load(filename) {
         const serializedData = fs.readFileSync(filename, { encoding: 'utf-8' });
         //COMPLETAR POR EL ALUMNO: Agregar a la lista todas las clases que necesitan ser instanciadas
-        const classes = [UNQfy];
+        const classes = [UNQfy, Artist];
         return picklify.unpicklify(JSON.parse(serializedData), classes);
     }
 }

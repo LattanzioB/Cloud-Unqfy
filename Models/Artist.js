@@ -20,6 +20,18 @@ class Artist {
     searchAlbum(id) {
         return this._albums.find(album => album._id === id)
     }
+
+    deleteAlbum(id) {
+        this.albums = this.albums.filter(album => album.id != id);
+    }
+
+    searchTrack(id) {
+        return this.albums.find(albums => albums.searchTrack(id));
+    }
+
+    searchAndDeleteTracks(id) {
+        this.albums.forEach(albums => albums.deleteTrack(id));
+    }
 }
 
 

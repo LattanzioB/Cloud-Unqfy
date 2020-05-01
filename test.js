@@ -147,3 +147,19 @@ describe('Playlist Creation and properties', () => {
         assert.lengthOf(playlist.tracks, 4);
     });
 });
+
+// describe('Test para verificar otros metodos', () => {
+//     let unqfy = null;
+
+//     beforeEach(() => {
+//         unqfy = new libunqfy.UNQfy();
+//     });
+
+//     it('Error artista repetidooooooo', () => {
+//         const artist = createAndAddArtist(unqfy, 'Guns n\' Roses', 'USA');
+//         const artist2 = createAndAddArtist(unqfy, 'Guns n\' Roses', 'USA');
+
+//         assert.equal(artist.error, 'Guns n\' Roses');
+
+//     });
+// });
