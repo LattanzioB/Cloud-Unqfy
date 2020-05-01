@@ -54,7 +54,8 @@ class UNQfy {
     //   albumData.year (number)
     // retorna: el nuevo album creado
     addAlbum(artistId, albumData) {
-        const checkAlbum = this.findAllAlbums().find(album => album.name === name);
+        const checkAlbum = this.findAllAlbums().find(album => album.name === albumData.name);
+
         if (checkAlbum) {
             throw new ErrorAlbumRepetido()
         }
@@ -78,7 +79,9 @@ class UNQfy {
     //   trackData.genres (lista de strings)
     // retorna: el nuevo track creado
     addTrack(albumId, trackData) {
-        const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(track => track.name === name);
+        const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(
+            track => track.name === trackData.name
+        );
         if (checkTrack) {
             throw new ErrorTrackRepetido()
         }
