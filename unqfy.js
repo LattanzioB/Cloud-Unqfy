@@ -6,15 +6,14 @@ const { Track } = require('./Models/Track');
 const { Playlist } = require('./Models/Playlist');
 const { ErrorNoExisteAlbum, ErrorNoExisteArtist } = require('./Models/Errors');
 const { flatMap } = require('lodash');
-
-class Handler {
-    handleAlbumError() {
-        console.log("El Album no existe")
-    }
-    handleArtistError() {
-        console.log("El Artista no existe")
-    }
-}
+const {
+    ErrorArtistaRepetido,
+    ErrorNoExisteArtist,
+    ErrorTrackRepetido,
+    ErrorNoExisteAlbum,
+    ErrorNoExisteTrack,
+    ErrorAlbumRepetido,
+} = require('./Models/Errors');
 
 class UNQfy {
 
@@ -32,6 +31,11 @@ class UNQfy {
     //   artistData.country (string)
     // retorna: el nuevo artista creado
     addArtist(artistData) {
+        const checkArtist = this.artistList.find(artist => artist.name === artistData.name)
+
+        if (checkArtist) {
+            throw new ErrorArtistaRepetido()
+        }
         let newArtist = new Artist(artistData.name, artistData.country, this.nextIdArtist);
         this.artistList.push(newArtist)
         this.nextIdArtist++;
@@ -51,8 +55,12 @@ class UNQfy {
     //   albumData.year (number)
     // retorna: el nuevo album creado
     addAlbum(artistId, albumData) {
+        const checkAlbum = this.findAllAlbums().find(album => album.name === name);
+        if (checkAlbum) {
+            throw new ErrorAlbumRepetido()
+        }
+
         const artist = this.getArtistById(artistId);
-        //console.log(artist);
         const newAlbum = new Album(albumData, this.nextIdAlbum);
         this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
@@ -71,6 +79,11 @@ class UNQfy {
     //   trackData.genres (lista de strings)
     // retorna: el nuevo track creado
     addTrack(albumId, trackData) {
+        const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(track => track.name === name);
+        if (checkTrack) {
+            throw new ErrorTrackRepetido()
+        }
+
         const album = this.getAlbumById(albumId);
         const track = new Track(trackData, this.nextIdTrack);
         this.nextIdTrack++;
@@ -85,38 +98,25 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        const artist = this.artistList.find(artist => artist.id == id)
-
-        try {
-            if (artist == undefined) {
-                throw new ErrorNoExisteArtist;
-            } else {
-                //console.log(artistAlbum.searchAlbum(id));
-                return (artist);
-            }
-        } catch (e) {
-            e.handle(new Handler())
+        const artist = this.artistList.find(artist => artist.id === id)
+        if (!artist) {
+            throw new ErrorArtistaInexistente;
         }
+        return artist
     }
 
     getAlbumById(id) {
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
+        const album = artistAlbum.searchAlbum(id);
+        if (!album) {
+            throw new ErrorNoExisteAlbum;
+        } //console.log(artistAlbum.searchAlbum(id));
 
-        try {
-            if (artistAlbum == undefined) {
-                throw new ErrorNoExisteAlbum;
-            } else {
-                //console.log(artistAlbum.searchAlbum(id));
-                return (artistAlbum.searchAlbum(id));
-            }
-        } catch (e) {
-            e.handle(new Handler())
-        }
+        return (artistAlbum.searchAlbum(id));
     }
 
     deleteArtist(id) {
         this.artistList = this.artistList.filter(artist => artist.id !== id)
-
     }
 
     deleteAlbum(id) {
@@ -124,13 +124,17 @@ class UNQfy {
     }
 
     deleteTrack(id) {
-        this.listaDeArtistas.forEach(artist => artist.buscarYBorrarTracks(id));
-        console.log(`Se borro el track ${id}`)
+        this.listaDeArtistas.forEach(artist => artist.searchAndDeleteTracks(id));
     }
 
-
     getTrackById(id) {
-
+        const artist = this.artistList.find(artist => artist.searchTrack(id));
+        const album = artist.searchTrack(id);
+        const track = album.searchTrack(id);
+        if (!track) {
+            throw new ErrorNoExisteTrack;
+        }
+        return track;
     }
 
     getPlaylistById(id) {
@@ -152,15 +156,10 @@ class UNQfy {
     // retorna: los tracks interpredatos por el artista con nombre artistName
     getArtistByName(artistName) {
         const artist = this.artistList.find(artist => artist.name == artistName);
-        try {
-            if (artist == undefined) {
-                throw new ErrorNoExisteArtist;
-            } else {
-                return (artist);
-            }
-        } catch (e) {
-            e.handle(new Handler());
+        if (artist == undefined) {
+            throw new ErrorNoExisteArtist;
         }
+        return artist
     }
 
 
