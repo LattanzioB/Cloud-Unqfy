@@ -1,19 +1,21 @@
-
-
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const unqmod = require('./unqfy'); // importamos el modulo unqfy
+const {
+    AddArtistCommand,
+    PrintArtistsCommand
+} = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
 function getUNQfy(filename = 'data.json') {
-  let unqfy = new unqmod.UNQfy();
-  if (fs.existsSync(filename)) {
-    unqfy = unqmod.UNQfy.load(filename);
-  }
-  return unqfy;
+    let unqfy = new unqmod.UNQfy();
+    if (fs.existsSync(filename)) {
+        unqfy = unqmod.UNQfy.load(filename);
+    }
+    return unqfy;
 }
 
 function saveUNQfy(unqfy, filename = 'data.json') {
-  unqfy.save(filename);
+    unqfy.save(filename);
 }
 
 /*
@@ -46,9 +48,35 @@ function saveUNQfy(unqfy, filename = 'data.json') {
 
 */
 
+class Command {
+    constructor() {
+        this.commands = {
+            addArtist: new AddArtistCommand(),
+            printArtistList: new PrintArtistsCommand(),
+        }
+    }
+    get(key) {
+        return this.commands[key];
+    }
+
+}
+
 function main() {
-  console.log('arguments: ');
-  process.argv.forEach(argument => console.log(argument));
+
+    const unqFy = getUNQfy();
+
+    const nameFunction = process.argv[2];
+    const args = process.argv.splice(3);
+    const operation = new Command();
+    try {
+        const command = operation.get(nameFunction);
+        console.log(command);
+        command.invoke(args, unqFy)
+        saveUNQfy(unqFy);
+    } catch (error) {
+        console.log(error);
+        //error.handle(handler); 
+    }
 }
 
 main();

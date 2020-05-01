@@ -4,7 +4,6 @@ const { Artist } = require('./Models/Artist');
 const { Album } = require('./Models/Album');
 const { Track } = require('./Models/Track');
 const { Playlist } = require('./Models/Playlist');
-const { ErrorNoExisteAlbum, ErrorNoExisteArtist } = require('./Models/Errors');
 const { flatMap } = require('lodash');
 const {
     ErrorArtistaRepetido,
@@ -257,7 +256,7 @@ class UNQfy {
     static load(filename) {
         const serializedData = fs.readFileSync(filename, { encoding: 'utf-8' });
         //COMPLETAR POR EL ALUMNO: Agregar a la lista todas las clases que necesitan ser instanciadas
-        const classes = [UNQfy];
+        const classes = [UNQfy, Artist];
         return picklify.unpicklify(JSON.parse(serializedData), classes);
     }
 }
