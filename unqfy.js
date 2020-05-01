@@ -114,6 +114,21 @@ class UNQfy {
         }
     }
 
+    deleteArtist(id) {
+        this.artistList = this.artistList.filter(artist => artist.id !== id)
+
+    }
+
+    deleteAlbum(id) {
+        this.artistList.forEach(artist => artist.deleteAlbum(id));
+    }
+
+    deleteTrack(id) {
+        this.listaDeArtistas.forEach(artist => artist.buscarYBorrarTracks(id));
+        console.log(`Se borro el track ${id}`)
+    }
+
+
     getTrackById(id) {
 
     }

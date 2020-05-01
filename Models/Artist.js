@@ -20,6 +20,10 @@ class Artist {
     searchAlbum(id) {
         return this._albums.find(album => album._id === id)
     }
+
+    deleteAlbum(id) {
+        this.albums = this.albums.filter(album => album.id != id);
+    }
 }
 
 
