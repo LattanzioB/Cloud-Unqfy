@@ -194,18 +194,14 @@ class UNQfy {
     }
 
     limitTracklistTime(trackList, time) {
-        let res = trackList;
-        let trackFinal = [];
-
-        while (res.length != 0) {
-            if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
-                trackFinal.push(res.pop())
-            } else {
-                res.pop()
-            }
+        let iterable = trackList;
+        let tracklistFinal = [];
+        //duracion de la tracklist + duracion del ultimo track <= maxtime
+        while (iterable.length != 0 || (this.trackListDuration(tracklistFinal) + iterable[iterable.length - 1].duration <= time)) { 
+            tracklistFinal.push(iterable.pop());
         }
         //console.log(trackFinal);
-        return trackFinal;
+        return tracklistFinal;
     }
 
     trackListDuration(trackList) {
