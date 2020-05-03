@@ -2,7 +2,10 @@ const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const unqmod = require('./unqfy'); // importamos el modulo unqfy
 const {
     AddArtistCommand,
-    PrintArtistsCommand
+    PrintArtistsCommand,
+    AddAlbumCommand,
+    AddTrackCommand,
+    CreatePlaylistCommand,
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -53,7 +56,10 @@ class Command {
         this.commands = {
             addArtist: new AddArtistCommand(),
             printArtistList: new PrintArtistsCommand(),
-        }
+            addAlbum: new AddAlbumCommand(),
+            addTrack: new AddTrackCommand(),
+            createPlaylist: new CreatePlaylistCommand(),
+        };
     }
     get(key) {
         return this.commands[key];

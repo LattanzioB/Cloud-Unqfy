@@ -102,7 +102,7 @@ class UNQfy {
     getArtistById(id) {
         const artist = this.artistList.find(artist => artist.id === id)
         if (!artist) {
-            throw new ErrorArtistaInexistente;
+            throw new ErrorNoExisteArtist;
         }
         return artist
     }
@@ -161,7 +161,7 @@ class UNQfy {
         if (artist == undefined) {
             throw new ErrorNoExisteArtist;
         }
-        return artist
+        return artist;
     }
 
 
@@ -185,7 +185,7 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
-        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400)
+        const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400);
 
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
@@ -195,7 +195,7 @@ class UNQfy {
 
     limitTracklistTime(trackList, time) {
         let res = trackList;
-        let trackFinal = []
+        let trackFinal = [];
 
         while (res.length != 0) {
             if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
