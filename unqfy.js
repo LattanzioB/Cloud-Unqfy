@@ -18,7 +18,7 @@ class UNQfy {
 
     constructor() {
         this.artistList = [];
-        this.listPlayList = [];
+        this.playLists = [];
         this.nextIdArtist = 0;
         this.nextIdPlayList = 0;
         this.nextIdTrack = 0;
@@ -53,15 +53,15 @@ class UNQfy {
     //   albumData.name (string)
     //   albumData.year (number)
     // retorna: el nuevo album creado
-    addAlbum(artistId, albumData) {
-        const checkAlbum = this.findAllAlbums().find(album => album.name === albumData.name);
+    addAlbum(artistId, { name, year }) {
+        const checkAlbum = this.findAllAlbums().find(album => album.name == name);
 
         if (checkAlbum) {
             throw new ErrorAlbumRepetido()
         }
 
         const artist = this.getArtistById(artistId);
-        const newAlbum = new Album(albumData, this.nextIdAlbum);
+        const newAlbum = new Album(this.nextIdAlbum, name, year);
         this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
         return newAlbum;
@@ -71,6 +71,7 @@ class UNQfy {
            - una propiedad year (number)
         */
     }
+    
 
 
     // trackData: objeto JS con los datos necesarios para crear un track
@@ -78,16 +79,16 @@ class UNQfy {
     //   trackData.duration (number)
     //   trackData.genres (lista de strings)
     // retorna: el nuevo track creado
-    addTrack(albumId, trackData) {
+    addTrack(albumId,{ name, duration, genres}) {
         const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(
-            track => track.name === trackData.name
+            track => track.name === name
         );
         if (checkTrack) {
             throw new ErrorTrackRepetido()
         }
 
         const album = this.getAlbumById(albumId);
-        const track = new Track(trackData, this.nextIdTrack);
+        const track = new Track(name, duration, genres, this.nextIdTrack);
         this.nextIdTrack++;
         album.addTrack(track);
         return track;
@@ -189,19 +190,23 @@ class UNQfy {
 
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
-        this.listPlayList.push(playlist);
+        this.playLists.push(playlist);
         return playlist;
     }
 
     limitTracklistTime(trackList, time) {
-        let iterable = trackList;
-        let tracklistFinal = [];
-        //duracion de la tracklist + duracion del ultimo track <= maxtime
-        while (iterable.length != 0 || (this.trackListDuration(tracklistFinal) + iterable[iterable.length - 1].duration <= time)) { 
-            tracklistFinal.push(iterable.pop());
+        let res = trackList;
+        let trackFinal = [];
+
+        while (res.length != 0 ) {
+            if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
+                trackFinal.push(res.pop())
+            } else {
+                res.pop()
+            }
         }
         //console.log(trackFinal);
-        return tracklistFinal;
+        return trackFinal;
     }
 
     trackListDuration(trackList) {
@@ -229,7 +234,7 @@ class UNQfy {
     }
 
     findAllPlaylistsByName(name) {
-        return this.listPlayList.filter(playlist => playlist.name.includes(name));
+        return this.playLists.filter(playlist => playlist.name.includes(name));
     }
 
     searchByName(name) {
@@ -255,7 +260,7 @@ class UNQfy {
     static load(filename) {
         const serializedData = fs.readFileSync(filename, { encoding: 'utf-8' });
         //COMPLETAR POR EL ALUMNO: Agregar a la lista todas las clases que necesitan ser instanciadas
-        const classes = [UNQfy, Artist];
+        const classes = [UNQfy, Artist, Album, Track, Playlist];
         return picklify.unpicklify(JSON.parse(serializedData), classes);
     }
 }

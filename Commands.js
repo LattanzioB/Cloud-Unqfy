@@ -11,25 +11,24 @@ class AddArtistCommand {
 
 class AddAlbumCommand {
     invoke(args, unqfy) {
-        const trackData = {
-            artistId: args[0],
+        const artistId = Number(args[0]);
+        const albumData = {
             name: args[1],
-            year: args[2]
-        };
-        console.log(unqfy.addAlbum(trackData));
-        console.log('Se agrego el album de forma correcta.');
+            year: Number(args[2]),
+        }
+        console.log(unqfy.addAlbum(artistId, albumData))
     }
 }
 
 class AddTrackCommand {
     invoke(args, unqfy) {
+        const albumId = Number(args[0])
         const trackData = {
-            albumName: args[0],
             name: args[1],
             duration: args[2],
             genres: args[3],
         };
-        console.log(unqfy.addTrack(trackData));
+        console.log(unqfy.addTrack(albumId, trackData));
         console.log('Se agrego el track de forma correcta.');
     }
 }
@@ -52,10 +51,32 @@ class PrintArtistsCommand {
     }
 }
 
+class PrintAlbumsCommand {
+    invoke(args, unqfy) {
+        console.log(unqfy.findAllAlbums());
+    }
+}
+
+class PrintTracksCommand {
+    invoke(args, unqfy) {
+        console.log(unqfy.findAllAlbums().flatMap(album => album.tracks));
+    }
+}
+
+class PrintPlayListCommand {
+    invoke(args, unqfy) {
+        console.log(unqfy.playLists);
+    }
+}
+
 module.exports = {
     AddArtistCommand,
-    PrintArtistsCommand,
     AddAlbumCommand,
     AddTrackCommand,
-    CreatePlaylistCommand
+    CreatePlaylistCommand,
+    PrintArtistsCommand,
+    PrintAlbumsCommand,
+    PrintTracksCommand,
+    PrintPlayListCommand
+
 };
