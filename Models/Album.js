@@ -10,6 +10,7 @@ class Album {
     get name() { return this._name }
     get year() { return this._year }
     get tracks() { return this._tracks }
+    set tracks(tracks) { return this._tracks = tracks }
 
     addTrack(track) {
         this._tracks.push(track);
@@ -19,10 +20,22 @@ class Album {
         return this.tracks.find(track => track.id === id);
     }
 
+
     deleteTrack(id) {
-        this.tracks = this.tracks.filter(track => track.id != id);
+        console.log(id);
+
+        this.tracks = this.tracks.filter(track => track.id !== id);
+        console.log(this.tracks);
+
     }
 
+    deleteAllTracks() {
+        this.tracks = []
+    }
+
+    getAllTracksIds() {
+        return this.tracks.map(track => track.id)
+    }
 }
 
 module.exports = { Album, }

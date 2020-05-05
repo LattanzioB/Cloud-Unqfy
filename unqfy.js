@@ -71,7 +71,7 @@ class UNQfy {
            - una propiedad year (number)
         */
     }
-    
+
 
 
     // trackData: objeto JS con los datos necesarios para crear un track
@@ -79,7 +79,7 @@ class UNQfy {
     //   trackData.duration (number)
     //   trackData.genres (lista de strings)
     // retorna: el nuevo track creado
-    addTrack(albumId,{ name, duration, genres}) {
+    addTrack(albumId, { name, duration, genres }) {
         const checkTrack = flatMap(this.findAllAlbums(), album => album.tracks).find(
             track => track.name === name
         );
@@ -109,25 +109,49 @@ class UNQfy {
     }
 
     getAlbumById(id) {
+        console.log(this.artistList[0]);
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
+
+
         const album = artistAlbum.searchAlbum(id);
         if (!album) {
             throw new ErrorNoExisteAlbum;
         } //console.log(artistAlbum.searchAlbum(id));
 
-        return (artistAlbum.searchAlbum(id));
+        return (album);
     }
 
     deleteArtist(id) {
-        this.artistList = this.artistList.filter(artist => artist.id !== id)
+        const artistToDelete = this.getArtistById(id);
+        const artistTracksIds = artistToDelete.getAllTracksIds()
+            //const tracksArtist = this.getArtistById(id).albums.flatMap(albums => albums.tracks)
+        const albums = artistToDelete.albums
+        albums.map(album => album.deleteAllTracks())
+        artistToDelete.deleteAllAlbums()
+
+        this.artistList = this.artistList.filter(artist => artist.id !== artistToDelete.id)
+        artistTracksIds.map(id => this.deleteTrackInPlayslistByID(id))
     }
 
     deleteAlbum(id) {
-        this.artistList.forEach(artist => artist.deleteAlbum(id));
+        //this.artistList.forEach(artist => artist.deleteAlbum(id));
+        const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
+        const album = this.getAlbumById(id)
+        const tracksIds = album.tracks.map(track => track.id)
+
+        album.deleteAllTracks()
+
+        tracksIds.map(id => this.deleteTrackInPlayslistByID(id))
+        artistAlbum.deleteAlbum(id)
     }
 
     deleteTrack(id) {
-        this.listaDeArtistas.forEach(artist => artist.searchAndDeleteTracks(id));
+        this.artistList.forEach(artist => artist.searchAndDeleteTracks(id));
+        this.deleteTrackInPlayslistByID(id)
+    }
+
+    deleteTrackInPlayslistByID(id) {
+        this.playLists.map(playlist => playlist.deleteTrackPlaylist(id))
     }
 
     getTrackById(id) {
@@ -146,9 +170,10 @@ class UNQfy {
 
     // genres: array de generos(strings)
     // retorna: los tracks que contenga alguno de los generos en el parametro genres
-    getTracksMatchingGenres(genres) {
+    getTracksMatchingGenres(genress) {
         const tracks = flatMap(this.findAllAlbums(), album => album.tracks);
-        const tracksFilteredByGenres = tracks.filter(track => track.genres.some(genre => genres.includes(genre)));
+
+        const tracksFilteredByGenres = tracks.filter(track => track.genres.some(genre => genress.includes(genre)));
         //console.log(tracksFilteredByGenres);
         return tracksFilteredByGenres;
 
@@ -178,7 +203,7 @@ class UNQfy {
     // genresToInclude: array de generos
     // maxDuration: duración en segundos
     // retorna: la nueva playlist creada
-    createPlaylist(name, genresToInclude, maxDuration) {
+    createPlaylist(name, maxDuration, genresToInclude) {
         /*** Crea una playlist y la agrega a unqfy. ***
           El objeto playlist creado debe soportar (al menos):
             * una propiedad name (string)
@@ -198,7 +223,7 @@ class UNQfy {
         let res = trackList;
         let trackFinal = [];
 
-        while (res.length != 0 ) {
+        while (res.length != 0) {
             if (this.trackListDuration(trackFinal) + res[res.length - 1].duration <= time) {
                 trackFinal.push(res.pop())
             } else {

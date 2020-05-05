@@ -12,6 +12,8 @@ class Playlist {
     get genresToInclude() { return this._genresToInclude }
     get duration() { return this._duration }
     get tracks() { return this._tracks }
+    set tracks(tracks) { return this._tracks = tracks }
+
 
 
     addTrack(track) {
@@ -19,9 +21,12 @@ class Playlist {
     }
 
 
-
     hasTrack(track) {
         return this._tracks.includes(track)
+    }
+
+    deleteTrackPlaylist(id) {
+        this.tracks = this.tracks.filter(track => track.id !== id)
     }
 
 }

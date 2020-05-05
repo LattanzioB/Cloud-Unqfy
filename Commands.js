@@ -25,8 +25,8 @@ class AddTrackCommand {
         const albumId = Number(args[0])
         const trackData = {
             name: args[1],
-            duration: args[2],
-            genres: args[3],
+            duration: Number(args[2]),
+            genres: args.slice(3, args.length)
         };
         console.log(unqfy.addTrack(albumId, trackData));
         console.log('Se agrego el track de forma correcta.');
@@ -35,12 +35,12 @@ class AddTrackCommand {
 
 class CreatePlaylistCommand {
     invoke(args, unqfy) {
-        const playlistData = {
-            name: args[0],
-            genres: args[1],
-            maxDuration: args[2],
-        };
-        console.log(unqfy.createPlaylist(playlistData));
+
+        const name = args[0]
+        const maxDuration = args[1]
+        const genres = args.slice(2, args.length)
+
+        console.log(unqfy.createPlaylist(name, maxDuration, genres));
         console.log('Se creo la playlist de forma correcta.');
     }
 }
@@ -69,6 +69,27 @@ class PrintPlayListCommand {
     }
 }
 
+class DeleteTrackCommand {
+    invoke(args, unqfy) {
+        const idTrack = Number(args[0])
+        console.log(unqfy.deleteTrack(idTrack));
+    }
+}
+
+class DeleteAlbumCommand {
+    invoke(args, unqfy) {
+        const idAlbum = Number(args[0])
+        console.log(unqfy.deleteAlbum(idAlbum));
+    }
+}
+
+class DeleteArtistCommand {
+    invoke(args, unqfy) {
+        const idArtist = Number(args[0])
+        console.log(unqfy.deleteArtist(idArtist));
+    }
+}
+
 module.exports = {
     AddArtistCommand,
     AddAlbumCommand,
@@ -77,6 +98,9 @@ module.exports = {
     PrintArtistsCommand,
     PrintAlbumsCommand,
     PrintTracksCommand,
-    PrintPlayListCommand
+    PrintPlayListCommand,
+    DeleteTrackCommand,
+    DeleteAlbumCommand,
+    DeleteArtistCommand
 
 };

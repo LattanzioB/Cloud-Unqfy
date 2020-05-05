@@ -11,14 +11,14 @@ class Artist {
     get country() { return this._country }
     get id() { return this._id }
     get albums() { return this._albums }
-
+    set albums(albums) { return this._albums = albums }
 
     addAlbum(album) {
         this._albums.push(album)
     }
 
     searchAlbum(id) {
-        return this._albums.find(album => album._id === id)
+        return this._albums.find(album => album._id == id)
     }
 
     deleteAlbum(id) {
@@ -31,6 +31,14 @@ class Artist {
 
     searchAndDeleteTracks(id) {
         this.albums.forEach(albums => albums.deleteTrack(id));
+    }
+
+    deleteAllAlbums() {
+        this.albums = []
+    }
+
+    getAllTracksIds() {
+        return this.albums.flatMap(album => album.getAllTracksIds())
     }
 }
 

@@ -8,7 +8,10 @@ const {
     PrintArtistsCommand,
     PrintAlbumsCommand,
     PrintTracksCommand,
-    PrintPlayListCommand
+    PrintPlayListCommand,
+    DeleteTrackCommand,
+    DeleteAlbumCommand,
+    DeleteArtistCommand
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -64,7 +67,10 @@ class Command {
             printAllArtistList: new PrintArtistsCommand(),
             printAllAlbumsList: new PrintAlbumsCommand,
             printAllTracks: new PrintTracksCommand(),
-            printAllPlaylists: new PrintPlayListCommand()
+            printAllPlaylists: new PrintPlayListCommand(),
+            deleteTrack: new DeleteTrackCommand(),
+            deleteAlbum: new DeleteAlbumCommand(),
+            deleteArtist: new DeleteArtistCommand()
         };
     }
     get(key) {
