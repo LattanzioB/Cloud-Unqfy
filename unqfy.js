@@ -192,7 +192,7 @@ class UNQfy {
 
 
     getTracksMatchingArtist(artistName) {
-        const artist = this.getArtistByName(artistName.name);
+        const artist = this.getArtistByName(artistName);
         const albums = artist.albums;
         const artistracks = flatMap(albums, album => album.tracks);
         return artistracks;

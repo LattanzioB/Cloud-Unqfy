@@ -90,6 +90,70 @@ class DeleteArtistCommand {
     }
 }
 
+class GetArtistByIdCommand {
+    invoke(args, unqfy) {
+        const idArtist = Number(args[0])
+        console.log(unqfy.getArtistByName(idArtist));
+    }
+}
+
+class GetAlbumByIdCommand {
+    invoke(args, unqfy) {
+        const idAlbum = Number(args[0])
+        console.log(unqfy.getAlbumById(idAlbum));
+    }
+}
+
+class GetTrackByIdCommand {
+    invoke(args, unqfy) {
+        const idTrack = Number(args[0])
+        console.log(unqfy.getTrackById(idTrack));
+    }
+}
+
+class GetPlaylistByIdCommand {
+    invoke(args, unqfy) {
+        const idPlayList = Number(args[0])
+        console.log(unqfy.getPlaylistById(idPlayList));
+    }
+}
+
+
+class GetTracksMatchingArtistCommand {
+    invoke(args, unqfy) {
+        const nameArtist = args[0]
+        console.log(unqfy.getTracksMatchingArtist(nameArtist));
+    }
+}
+
+class FindArtistByNameCommand {
+    invoke(args, unqfy) {
+        const name = args[0]
+        console.log(unqfy.getArtistByName(name));
+    }
+}
+
+class FindAlbumsByNameCommand {
+    invoke(args, unqfy) {
+        const name = args[0]
+        console.log(unqfy.findAllAlbumsByName(name));
+    }
+}
+
+class FindTracksByNameCommand {
+    invoke(args, unqfy) {
+        const name = args[0]
+        console.log(unqfy.findAllTracksByName(name));
+    }
+}
+
+class FindPlaylistsByNameCommand {
+    invoke(args, unqfy) {
+        const name = args[0]
+        console.log(unqfy.findAllPlaylistsByName(name));
+    }
+}
+
 module.exports = {
     AddArtistCommand,
     AddAlbumCommand,
@@ -101,6 +165,15 @@ module.exports = {
     PrintPlayListCommand,
     DeleteTrackCommand,
     DeleteAlbumCommand,
-    DeleteArtistCommand
+    DeleteArtistCommand,
+    GetArtistByIdCommand,
+    GetAlbumByIdCommand,
+    GetTrackByIdCommand,
+    GetPlaylistByIdCommand,
+    GetTracksMatchingArtistCommand,
+    FindArtistByNameCommand,
+    FindAlbumsByNameCommand,
+    FindPlaylistsByNameCommand,
+    FindTracksByNameCommand,
 
 };

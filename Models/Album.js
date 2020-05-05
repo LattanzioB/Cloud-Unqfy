@@ -16,17 +16,13 @@ class Album {
         this._tracks.push(track);
     }
 
-    seachTrack(id) {
+    searchTrack(id) {
         return this.tracks.find(track => track.id === id);
     }
 
 
     deleteTrack(id) {
-        console.log(id);
-
         this.tracks = this.tracks.filter(track => track.id !== id);
-        console.log(this.tracks);
-
     }
 
     deleteAllTracks() {

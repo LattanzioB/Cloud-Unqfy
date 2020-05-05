@@ -11,7 +11,16 @@ const {
     PrintPlayListCommand,
     DeleteTrackCommand,
     DeleteAlbumCommand,
-    DeleteArtistCommand
+    DeleteArtistCommand,
+    GetArtistByIdCommand,
+    GetTracksMatchingArtistCommand,
+    GetAlbumByIdCommand,
+    GetTrackByIdCommand,
+    GetPlaylistByIdCommand,
+    FindArtistByNameCommand,
+    FindAlbumsByNameCommand,
+    FindPlaylistsByNameCommand,
+    FindTracksByNameCommand,
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -70,9 +79,19 @@ class Command {
             printAllPlaylists: new PrintPlayListCommand(),
             deleteTrack: new DeleteTrackCommand(),
             deleteAlbum: new DeleteAlbumCommand(),
-            deleteArtist: new DeleteArtistCommand()
+            deleteArtist: new DeleteArtistCommand(),
+            getArtistById: new GetArtistByIdCommand(),
+            getTracksMatchingArtist: new GetTracksMatchingArtistCommand(),
+            getTrackById: new GetTrackByIdCommand(),
+            getAlbumtById: new GetAlbumByIdCommand(),
+            getPlaylistById: new GetPlaylistByIdCommand(),
+            findArtistByName: new FindArtistByNameCommand(),
+            findAlbumsByName: new FindAlbumsByNameCommand(),
+            findPlaylistsByName: new FindPlaylistsByNameCommand(),
+            FindTracksByName: new FindTracksByNameCommand(),
         };
     }
+
     get(key) {
         return this.commands[key];
     }
