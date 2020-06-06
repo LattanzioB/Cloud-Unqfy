@@ -37,6 +37,8 @@ class UNQfy {
                 });
                 console.log(albums);
 
+            }).then(() => {
+                this.save("data.json") //PREGUNTAR
             })
             .catch(error => console.log(error));
     }
