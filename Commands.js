@@ -1,3 +1,11 @@
+const { SpotifyClient } = require('./Clients/Spotify');
+
+class PopulateAlbumsForArtist {
+    invoke(args, unqfy) {
+        return unqfy.populateAlbumsForArtist(Number(args[0]), new SpotifyClient());
+    }
+}
+
 class AddArtistCommand {
     invoke(args, unqfy) {
         const artistData = {
@@ -175,5 +183,6 @@ module.exports = {
     FindAlbumsByNameCommand,
     FindPlaylistsByNameCommand,
     FindTracksByNameCommand,
+    PopulateAlbumsForArtist,
 
 };

@@ -21,6 +21,7 @@ const {
     FindAlbumsByNameCommand,
     FindPlaylistsByNameCommand,
     FindTracksByNameCommand,
+    PopulateAlbumsForArtist,
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -89,6 +90,7 @@ class Command {
             findAlbumsByName: new FindAlbumsByNameCommand(),
             findPlaylistsByName: new FindPlaylistsByNameCommand(),
             FindTracksByName: new FindTracksByNameCommand(),
+            populateAlbumsForArtist: new PopulateAlbumsForArtist(),
         };
     }
 

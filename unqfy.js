@@ -25,6 +25,36 @@ class UNQfy {
         this.nextIdAlbum = 0;
     }
 
+    populateAlbumsForArtist(artistId, spotifyClient) {
+        const artistName = this.getArtistById(artistId).name;
+
+        return spotifyClient.getArtistByName(artistName)
+            .then(idArtistSpotify => spotifyClient.populateAlbumsForArtist(idArtistSpotify))
+            .then(albums => {
+                albums.forEach(element => {
+                    this.addAlbumNoObject(artistId, element.name, element.release_date);
+
+                });
+                console.log(albums);
+
+            })
+            .catch(error => console.log(error));
+    }
+
+    addAlbumNoObject(artistId, name, year) {
+        console.log(name);
+
+        const artist = this.getArtistById(artistId);
+        // console.log(artist);
+
+        const album = new Album(this.nextIdAlbum, name, year);
+
+        artist.addAlbum(album);
+
+        this.nextIdAlbum++;
+        return album;
+    }
+
     // artistData: objeto JS con los datos necesarios para crear un artista
     //   artistData.name (string)
     //   artistData.country (string)
@@ -109,7 +139,7 @@ class UNQfy {
     }
 
     getAlbumById(id) {
-        console.log(this.artistList[0]);
+        // console.log(this.artistList[0]);
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
 
 
@@ -156,7 +186,9 @@ class UNQfy {
 
     getTrackById(id) {
         const artist = this.artistList.find(artist => artist.searchTrack(id));
+        //agregar error artist
         const album = artist.searchTrack(id);
+        //agregar error album
         const track = album.searchTrack(id);
         if (!track) {
             throw new ErrorNoExisteTrack;
@@ -172,7 +204,7 @@ class UNQfy {
     // retorna: los tracks que contenga alguno de los generos en el parametro genres
     getTracksMatchingGenres(genress) {
         const tracks = flatMap(this.findAllAlbums(), album => album.tracks);
-
+        //refactor
         const tracksFilteredByGenres = tracks.filter(track => track.genres.some(genre => genress.includes(genre)));
         //console.log(tracksFilteredByGenres);
         return tracksFilteredByGenres;
@@ -219,6 +251,7 @@ class UNQfy {
         return playlist;
     }
 
+    //refactor
     limitTracklistTime(trackList, time) {
         let res = trackList;
         let trackFinal = [];
