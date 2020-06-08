@@ -13,6 +13,17 @@ class Artist {
     get albums() { return this._albums }
     set albums(albums) { return this._albums = albums }
 
+    toJson() {
+
+        let artista = {
+            id: this._id,
+            name: this.name,
+            country: this.country
+        }
+
+        return artista
+    }
+
     addAlbum(album) {
         this._albums.push(album)
     }

@@ -50,7 +50,7 @@ class UNQfy {
     }
 
     getAllArtist() {
-        return this.listaDeArtistas;
+        return this.artistList;
     }
 
     // artistData: objeto JS con los datos necesarios para crear un artista
