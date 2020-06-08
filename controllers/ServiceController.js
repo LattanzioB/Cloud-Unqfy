@@ -1,7 +1,7 @@
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const unqmod = require('../unqfy'); // importamos el modulo unqfy
 
-class ArtistaController {
+class ServiceController {
     getUNQfy(filename = 'data.json') {
         let unqfy = new unqmod.UNQfy();
         if (fs.existsSync(filename)) {
@@ -15,13 +15,6 @@ class ArtistaController {
     }
 }
 
-// exports.all = (req, res, next) => {
-//     const artists = req.query.name ?
-//         res.locals.unqfy.findAllArtistByName(req.query.name) :
-//         res.locals.unqfy.getAllArtist();
-//     return next({ status: 200, data: artists });
-// };
-
 module.exports = {
-    ArtistaController,
+    ServiceController,
 };
