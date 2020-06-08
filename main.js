@@ -113,7 +113,11 @@ function main() {
         const command = operation.get(nameFunction);
         console.log(command);
         command.invoke(args, unqFy)
-        saveUNQfy(unqFy);
+        if (nameFunction != "populateAlbumsForArtist") {
+            console.log(nameFunction);
+            console.log("ENTRANDO EN EL IF ----------------------------------------------------------");
+            saveUNQfy(unqFy);
+        }
     } catch (error) {
         console.log(error);
         //error.handle(handler); 

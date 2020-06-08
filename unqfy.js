@@ -35,26 +35,22 @@ class UNQfy {
                     this.addAlbumNoObject(artistId, element.name, element.release_date);
 
                 });
-                console.log(albums);
+                // console.log(albums);
 
-            }).then(() => {
-                this.save("data.json") //PREGUNTAR
             })
             .catch(error => console.log(error));
     }
 
     addAlbumNoObject(artistId, name, year) {
-        console.log(name);
-
         const artist = this.getArtistById(artistId);
-        // console.log(artist);
-
         const album = new Album(this.nextIdAlbum, name, year);
-
         artist.addAlbum(album);
-
         this.nextIdAlbum++;
         return album;
+    }
+
+    getAllArtist() {
+        return this.listaDeArtistas;
     }
 
     // artistData: objeto JS con los datos necesarios para crear un artista

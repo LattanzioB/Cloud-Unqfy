@@ -2,7 +2,9 @@ const { SpotifyClient } = require('./Clients/Spotify');
 
 class PopulateAlbumsForArtist {
     invoke(args, unqfy) {
-        return unqfy.populateAlbumsForArtist(Number(args[0]), new SpotifyClient());
+        return unqfy.populateAlbumsForArtist(Number(args[0]), new SpotifyClient()).then(() => {
+            unqfy.save("data.json") //PREGUNTAR
+        })
     }
 }
 
