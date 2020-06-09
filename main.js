@@ -24,6 +24,7 @@ const {
     FindPlaylistsByNameCommand,
     FindTracksByNameCommand,
     PopulateAlbumsForArtist,
+    GetLyricsCommand,
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -93,6 +94,7 @@ class Command {
             findPlaylistsByName: new FindPlaylistsByNameCommand(),
             FindTracksByName: new FindTracksByNameCommand(),
             populateAlbumsForArtist: new PopulateAlbumsForArtist(),
+            getLyrics: new GetLyricsCommand(),
         };
     }
 
@@ -113,11 +115,14 @@ function main() {
         const command = operation.get(nameFunction);
         console.log(command);
         command.invoke(args, unqFy)
-        if (nameFunction != "populateAlbumsForArtist") {
+        console.log(nameFunction);
+
+        if (nameFunction != "getLyrics") {
             console.log(nameFunction);
-            console.log("ENTRANDO EN EL IF ----------------------------------------------------------");
+            console.log("ENTRANDerewrO EN EL IF ----------------------------------------------------------");
             saveUNQfy(unqFy);
         }
+
     } catch (error) {
         console.log(error);
         //error.handle(handler); 

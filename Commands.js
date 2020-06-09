@@ -1,9 +1,19 @@
 const { SpotifyClient } = require('./Clients/Spotify');
+const { MusicMatchClient } = require('./Clients/MusicMatch');
+
 
 class PopulateAlbumsForArtist {
     invoke(args, unqfy) {
         return unqfy.populateAlbumsForArtist(Number(args[0]), new SpotifyClient()).then(() => {
-            unqfy.save("data.json") //PREGUNTAR
+            unqfy.save("data.json")
+        })
+    }
+}
+
+class GetLyricsCommand {
+    invoke(args, unqfy) {
+        return unqfy.getLyrics(Number(args[0]), new MusicMatchClient()).then(() => {
+            unqfy.save("data.json")
         })
     }
 }
@@ -186,5 +196,6 @@ module.exports = {
     FindPlaylistsByNameCommand,
     FindTracksByNameCommand,
     PopulateAlbumsForArtist,
+    GetLyricsCommand,
 
 };

@@ -18,7 +18,8 @@ class Artist {
         let artista = {
             id: this._id,
             name: this.name,
-            country: this.country
+            country: this.country,
+            albums: this._albums
         }
 
         return artista
