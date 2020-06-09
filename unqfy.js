@@ -25,6 +25,20 @@ class UNQfy {
         this.nextIdAlbum = 0;
     }
 
+    getLyrics(trackId, musicMatchClient) {
+        const tema = this.getTrackById(trackId);
+        console.log(tema);
+
+        if (!tema.lyrics.length) {
+            return musicMatchClient
+                .searchTrackId(tema.name)
+                .then(respuestaID => musicMatchClient.getTrackLyrics(respuestaID))
+                .then(respuestaLyrics => tema.setLyrics(respuestaLyrics));
+        } else {
+            return tema.lyrics;
+        }
+    }
+
     populateAlbumsForArtist(artistId, spotifyClient) {
         const artistName = this.getArtistById(artistId).name;
 
@@ -64,6 +78,8 @@ class UNQfy {
             throw new ErrorArtistaRepetido()
         }
         let newArtist = new Artist(artistData.name, artistData.country, this.nextIdArtist);
+        console.log(newArtist);
+
         this.artistList.push(newArtist)
         this.nextIdArtist++;
 
@@ -184,11 +200,15 @@ class UNQfy {
 
     getTrackById(id) {
         const artist = this.artistList.find(artist => artist.searchTrack(id));
+        console.log(artist);
+
         //agregar error artist
         const album = artist.searchTrack(id);
         //agregar error album
         const track = album.searchTrack(id);
         if (!track) {
+            console.log("NO HAY TRACK");
+
             throw new ErrorNoExisteTrack;
         }
         return track;
