@@ -14,6 +14,10 @@ const {
     ErrorAlbumRepetido,
 } = require('./Models/Errors');
 
+const {
+    ArtistInexistenteError,
+} = require('./Models/APIError');
+
 class UNQfy {
 
     constructor() {
@@ -28,7 +32,7 @@ class UNQfy {
     getLyrics(trackId, musicMatchClient) {
         const tema = this.getTrackById(trackId);
         console.log(tema);
-
+        //refactor track.getLyrics
         if (!tema.lyrics.length) {
             return musicMatchClient
                 .searchTrackId(tema.name)
@@ -61,6 +65,17 @@ class UNQfy {
         artist.addAlbum(album);
         this.nextIdAlbum++;
         return album;
+    }
+
+    updateArtist(id, { name, country }) {
+        const artist = this.getArtistById(id);
+        if (!artist) {
+            throw new ErrorNoExisteArtist();
+        }
+        artist._name = name;
+        artist._country = country;
+
+        return artist;
     }
 
     getAllArtist() {
