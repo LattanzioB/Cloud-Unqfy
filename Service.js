@@ -65,5 +65,17 @@ router.get('/tracks/:id/lyrics', function(req, res) {
     res.json({ status: 200, data: { lyric: lyrics } });
 });
 
+//********************************************************/
+
+router.get('/album/', function(req, res) {
+    const albums = req.query.name ?
+    service.getUNQfy().findAllAlbumsByName(req.query.name) :
+        service.getUNQfy().findAllAlbums();
+
+    let albumJson = albums.map(album => album.toJson())
+
+    res.json({ status: 200, data: albumJson });
+});
+
 app.use('/api', router);
 app.listen(port);
