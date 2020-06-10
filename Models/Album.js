@@ -32,6 +32,18 @@ class Album {
     getAllTracksIds() {
         return this.tracks.map(track => track.id)
     }
-}
 
-module.exports = { Album, }
+    toJson() {
+
+        let album = {
+            id: this._id,
+            name: this._name,
+            year: this._year,
+            tracks: this._tracks,
+        }
+        return album
+
+    }
+
+}
+module.exports = { Album }
