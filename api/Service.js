@@ -1,16 +1,16 @@
 let express = require('express'); // import express
 let app = express(); // define our app using express
 let router = express.Router();
-const serviceController = require('./controllers/ServiceController');
+const serviceController = require('../controllers/ServiceController');
 const { flatMap } = require('lodash');
 const {
-    ArtistInexistenteError,
-} = require('./Models/APIError');
-const { MusicMatchClient } = require('./Clients/MusicMatch');
+    NotFoundError,
+} = require('./APIError');
+const { MusicMatchClient } = require('../Clients/MusicMatch');
 let port = process.env.PORT || 8080; // set our port
 let service = new serviceController.ServiceController()
 let bodyParser = require('body-parser');
-const { ErrorHandler } = require('./ErrorHandler');
+const { ErrorHandler } = require('../ErrorHandler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -35,7 +35,7 @@ router.get('/artists/:id', function(req, res) {
         let artistJson = artist.toJson()
         res.json({ status: 200, data: artistJson });
     } catch {
-        throw new ArtistInexistenteError
+        throw new NotFoundError
     }
 
 });
@@ -72,6 +72,28 @@ router.get('/tracks/:id/lyrics', function(req, res) {
 
     res.json({ status: 200, data: { lyric: lyrics } });
 });
+
+router.post('/playlists/', function(req, res) {
+    const unqfy = service.getUNQfy()
+    const playList = unqfy.createPlaylist(req.body);
+    let playListJson = playList.toJson()
+
+    service.saveUNQfy(unqfy)
+
+    res.json({ status: 201, data: playListJson });
+
+})
+
+router.post('/playlistsT/', function(req, res) {
+    const unqfy = service.getUNQfy()
+    const playList = unqfy.createPlaylistByTracks(req.body);
+    // let playListJson = playList.toJson()
+
+    service.saveUNQfy(unqfy)
+
+    res.json({ status: 201, data: { message: "OK" } });
+
+})
 
 
 app.use('/api', router);

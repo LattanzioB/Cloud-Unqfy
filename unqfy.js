@@ -16,7 +16,7 @@ const {
 
 const {
     ArtistInexistenteError,
-} = require('./Models/APIError');
+} = require('./api/APIError');
 
 class UNQfy {
 
@@ -27,6 +27,19 @@ class UNQfy {
         this.nextIdPlayList = 0;
         this.nextIdTrack = 0;
         this.nextIdAlbum = 0;
+    }
+
+    createPlaylistByTracks({ name, tracks, maxDuration }) {
+        const traksConcret = tracks.map(idTrack => this.getTrackById(idTrack));
+        console.log(traksConcret);
+        const genresToInclude = traksConcret.map(track => track.genres);
+        console.log(genresToInclude);
+
+        const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, traksConcret);
+
+        this.nextIdPlayList++;
+        this.playLists.push(playlist);
+        return playlist;
     }
 
     getLyrics(trackId, musicMatchClient) {
@@ -268,13 +281,15 @@ class UNQfy {
     // genresToInclude: array de generos
     // maxDuration: duración en segundos
     // retorna: la nueva playlist creada
-    createPlaylist(name, maxDuration, genresToInclude) {
+    createPlaylist({ name, maxDuration, genresToInclude }) {
         /*** Crea una playlist y la agrega a unqfy. ***
           El objeto playlist creado debe soportar (al menos):
             * una propiedad name (string)
             * un metodo duration() que retorne la duración de la playlist.
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
+        console.log("REVISAR EL NOMBRE DE LOS PARAMETROS DESDE POSTMAN");
+
         const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
         const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400);
 
