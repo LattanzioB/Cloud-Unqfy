@@ -1,5 +1,7 @@
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const unqmod = require('./unqfy'); // importamos el modulo unqfy
+let express = require('express'); // import express
+
 const {
     AddArtistCommand,
     AddAlbumCommand,
@@ -21,6 +23,8 @@ const {
     FindAlbumsByNameCommand,
     FindPlaylistsByNameCommand,
     FindTracksByNameCommand,
+    PopulateAlbumsForArtist,
+    GetLyricsCommand,
 } = require('./Commands');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
@@ -89,6 +93,8 @@ class Command {
             findAlbumsByName: new FindAlbumsByNameCommand(),
             findPlaylistsByName: new FindPlaylistsByNameCommand(),
             FindTracksByName: new FindTracksByNameCommand(),
+            populateAlbumsForArtist: new PopulateAlbumsForArtist(),
+            getLyrics: new GetLyricsCommand(),
         };
     }
 
@@ -109,7 +115,14 @@ function main() {
         const command = operation.get(nameFunction);
         console.log(command);
         command.invoke(args, unqFy)
-        saveUNQfy(unqFy);
+        console.log(nameFunction);
+
+        if (nameFunction != "getLyrics") {
+            console.log(nameFunction);
+            console.log("ENTRANDerewrO EN EL IF ----------------------------------------------------------");
+            saveUNQfy(unqFy);
+        }
+
     } catch (error) {
         console.log(error);
         //error.handle(handler); 
