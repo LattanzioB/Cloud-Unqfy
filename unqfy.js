@@ -125,7 +125,9 @@ class UNQfy {
     //   albumData.name (string)
     //   albumData.year (number)
     // retorna: el nuevo album creado
-    addAlbum(artistId, { name, year }) {
+    addAlbum({ artistId, name, year }) {
+        console.log(artistId);
+
         const checkAlbum = this.findAllAlbums().find(album => album.name == name);
 
         if (checkAlbum) {
