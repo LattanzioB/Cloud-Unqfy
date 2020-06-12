@@ -12,3 +12,7 @@ class ArtistInexistenteError extends APIError {
         super('ArtistInexistenteError', 400, 'RELATED_RESOURCE_NOT_FOUND');
     }
 }
+
+module.exports = {
+    ArtistInexistenteError,
+};
