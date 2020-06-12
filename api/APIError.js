@@ -7,12 +7,12 @@ class APIError extends Error {
     }
 }
 
-class ArtistInexistenteError extends APIError {
+class NotFoundError extends APIError {
     constructor() {
-        super('ArtistInexistenteError', 400, 'RELATED_RESOURCE_NOT_FOUND');
+        super('NotFoundError', 400, 'RELATED_RESOURCE_NOT_FOUND');
     }
 }
 
 module.exports = {
-    ArtistInexistenteError,
+    NotFoundError,
 };

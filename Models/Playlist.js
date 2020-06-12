@@ -14,7 +14,18 @@ class Playlist {
     get tracks() { return this._tracks }
     set tracks(tracks) { return this._tracks = tracks }
 
+    toJson() {
 
+        let playlist = {
+            id: this._id,
+            name: this._name,
+            genresToInclude: this._genresToInclude,
+            duration: this._duration,
+            tracks: this._tracksn
+        }
+
+        return playlist
+    }
 
     addTrack(track) {
         this._tracks.push(track);
