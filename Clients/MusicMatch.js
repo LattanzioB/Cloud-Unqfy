@@ -9,6 +9,8 @@ class MusicMatchClient {
 
 
     searchTrackId(trackName) {
+        console.log(trackName);
+
         const options = {
             uri: this.baseURL + '/track.search',
             qs: {

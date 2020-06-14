@@ -21,7 +21,7 @@ class Playlist {
             name: this._name,
             genresToInclude: this._genresToInclude,
             duration: this._duration,
-            tracks: this._tracksn
+            tracks: this._tracks
         }
 
         return playlist

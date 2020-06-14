@@ -12,11 +12,14 @@ const {
     ErrorNoExisteAlbum,
     ErrorNoExisteTrack,
     ErrorAlbumRepetido,
+    ErrorParametrosInsuficientes,
 } = require('./Models/Errors');
 
 const {
     ArtistInexistenteError,
 } = require('./api/APIError');
+const { LOADIPHLPAPI } = require('dns');
+const { log } = require('console');
 
 class UNQfy {
 
@@ -31,9 +34,7 @@ class UNQfy {
 
     createPlaylistByTracks({ name, tracks, maxDuration }) {
         const traksConcret = tracks.map(idTrack => this.getTrackById(idTrack));
-        console.log(traksConcret);
         const genresToInclude = traksConcret.map(track => track.genres);
-        console.log(genresToInclude);
 
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, traksConcret);
 
@@ -44,7 +45,7 @@ class UNQfy {
 
     getLyrics(trackId, musicMatchClient) {
         const tema = this.getTrackById(trackId);
-        console.log(tema);
+        console.log(tema.name);
         //refactor track.getLyrics
         if (!tema.lyrics.length) {
             return musicMatchClient
@@ -100,13 +101,16 @@ class UNQfy {
     //   artistData.country (string)
     // retorna: el nuevo artista creado
     addArtist(artistData) {
+        if (!artistData.name || !artistData.country) {
+            throw new ErrorParametrosInsuficientes()
+        }
+
         const checkArtist = this.artistList.find(artist => artist.name === artistData.name)
 
         if (checkArtist) {
             throw new ErrorArtistaRepetido()
         }
         let newArtist = new Artist(artistData.name, artistData.country, this.nextIdArtist);
-        console.log(newArtist);
 
         this.artistList.push(newArtist)
         this.nextIdArtist++;
@@ -126,7 +130,14 @@ class UNQfy {
     //   albumData.year (number)
     // retorna: el nuevo album creado
     addAlbum({ artistId, name, year }) {
+
         console.log(artistId);
+
+
+        if (artistId === undefined || !name || !year) {
+            throw new ErrorParametrosInsuficientes()
+        }
+
 
         const checkAlbum = this.findAllAlbums().find(album => album.name == name);
 
@@ -135,6 +146,11 @@ class UNQfy {
         }
 
         const artist = this.getArtistById(artistId);
+
+        if (!artist) {
+            throw new ErrorNoExisteArtist()
+        }
+
         const newAlbum = new Album(this.nextIdAlbum, name, year);
         this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
@@ -183,22 +199,25 @@ class UNQfy {
     }
 
     getAlbumById(id) {
-        // console.log(this.artistList[0]);
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
 
-
-        const album = artistAlbum.searchAlbum(id);
-        if (!album) {
+        if (!artistAlbum) {
             throw new ErrorNoExisteAlbum;
-        } //console.log(artistAlbum.searchAlbum(id));
+        }
 
-        return (album);
+        return artistAlbum.searchAlbum(id);
+    }
+
+    changeAlbumYear(id, year) {
+        const album = this.getAlbumById(id);
+        album.year = year;
+
+        return album;
     }
 
     deleteArtist(id) {
         const artistToDelete = this.getArtistById(id);
         const artistTracksIds = artistToDelete.getAllTracksIds()
-            //const tracksArtist = this.getArtistById(id).albums.flatMap(albums => albums.tracks)
         const albums = artistToDelete.albums
         albums.map(album => album.deleteAllTracks())
         artistToDelete.deleteAllAlbums()
@@ -208,7 +227,6 @@ class UNQfy {
     }
 
     deleteAlbum(id) {
-        //this.artistList.forEach(artist => artist.deleteAlbum(id));
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
         const album = this.getAlbumById(id)
         const tracksIds = album.tracks.map(track => track.id)
@@ -224,29 +242,36 @@ class UNQfy {
         this.deleteTrackInPlayslistByID(id)
     }
 
+    deletePlayList(id) {
+        this.playLists = this.playLists.filter(playlist => playlist.id !== id);
+    }
+
     deleteTrackInPlayslistByID(id) {
         this.playLists.map(playlist => playlist.deleteTrackPlaylist(id))
     }
 
     getTrackById(id) {
         const artist = this.artistList.find(artist => artist.searchTrack(id));
-        console.log(artist);
-
         //agregar error artist
         const album = artist.searchTrack(id);
         //agregar error album
         const track = album.searchTrack(id);
         if (!track) {
-            console.log("NO HAY TRACK");
-
             throw new ErrorNoExisteTrack;
         }
         return track;
     }
 
     getPlaylistById(id) {
-        return this.listPlayList.find(playlist => playlist.id === id);
+        return this.playLists.find(playlist => playlist.id === id);
     }
+
+    //, durationLT, durationGT
+    getPlaylistByIdAndParams(name, durationLT, durationGT) {
+        return this.playLists.filter(playlist => playlist.name.toLowerCase().includes(name.toLowerCase()) &&
+            playlist.duration <= durationLT && playlist.duration >= durationGT);
+    }
+
 
     // genres: array de generos(strings)
     // retorna: los tracks que contenga alguno de los generos en el parametro genres
@@ -283,7 +308,7 @@ class UNQfy {
     // genresToInclude: array de generos
     // maxDuration: duración en segundos
     // retorna: la nueva playlist creada
-    createPlaylist({ name, maxDuration, genresToInclude }) {
+    createPlaylist({ name, maxDuration, genres }) {
         /*** Crea una playlist y la agrega a unqfy. ***
           El objeto playlist creado debe soportar (al menos):
             * una propiedad name (string)
@@ -291,11 +316,12 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         console.log("REVISAR EL NOMBRE DE LOS PARAMETROS DESDE POSTMAN");
+        console.log(genres);
 
-        const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
+        const trakcsWithGenre = this.getTracksMatchingGenres(genres);
         const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400);
 
-        const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
+        const playlist = new Playlist(this.nextIdPlayList, name, genres, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
         this.playLists.push(playlist);
         return playlist;
@@ -326,7 +352,7 @@ class UNQfy {
     }
 
     findAllArtistByName(name) {
-        return this.artistList.filter(artist => artist.name.includes(name));
+        return this.artistList.filter(artist => artist.name.toLowerCase().includes(name));
     }
 
     findAllAlbums() {
@@ -334,7 +360,8 @@ class UNQfy {
     }
 
     findAllAlbumsByName(name) {
-        return this.findAllAlbums().filter(album => album.name.includes(name));
+        return this.findAllAlbums().filter(album => album.name.toLowerCase().includes(name.toLowerCase()));
+
     }
 
     findAllTracksByName(name) {
