@@ -7,19 +7,41 @@ class APIError extends Error {
     }
 }
 
+class NotFoundRelatedError extends APIError {
+    constructor() {
+        super('NotFoundRelatedError', 404, 'RELATED_RESOURCE_NOT_FOUND');
+    }
+}
+
 class NotFoundError extends APIError {
     constructor() {
         super('NotFoundError', 404, 'RESOURCE_NOT_FOUND');
     }
 }
 
-class AlreadyExistsError extends APIError {
+class AlreadyExistError extends APIError {
     constructor() {
-        super('AlreadyExistsError', 409, 'RESOURCE_ALREADY_EXISTS');
+        super('AlreadyExistError', 409, 'RESOURCE_ALREADY_EXISTS')
+    }
+}
+
+class BadRequestError extends APIError {
+    constructor() {
+        super('BadRequest', 400, 'BAD_REQUEST')
+    }
+}
+
+class UnexpectedFailureError extends APIError {
+    constructor() {
+        super('UnexpectedFailureError', 500, 'INTERNAL_SERVER_ERROR')
     }
 }
 
 module.exports = {
     NotFoundError,
-    AlreadyExistsError
+    NotFoundRelatedError,
+    AlreadyExistError,
+    BadRequestError,
+    UnexpectedFailureError
+
 };

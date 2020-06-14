@@ -94,6 +94,66 @@ router.get('/tracks/:id/lyrics/', function(req, res) {
 
 });
 
+
+//********************************************************/
+
+router.get('/albums/', function(req, res) {
+    const albums = req.query.name ?
+        service.getUNQfy().findAllAlbumsByName(req.query.name) :
+        service.getUNQfy().findAllAlbums();
+
+    let albumJson = albums.map(album => album.toJson())
+
+    res.json({ status: 200, data: albumJson });
+});
+
+
+
+
+router.get('/albums/:id', function(req, res, next) {
+    const albumId = req.params.id
+
+
+    try {
+        const album = service.getUNQfy().getAlbumById(albumId);
+        let albumJson = album.toJson();
+        res.json({ status: 200, data: albumJson });
+    } catch (e) {
+        next(new NotFoundError());
+    }
+});
+
+router.post('/albums/', function(req, res) {
+    const unqfy = service.getUNQfy()
+    const album = unqfy.addAlbum(req.body)
+    let albumJson = album.toJson()
+    service.saveUNQfy(unqfy)
+
+    res.json({ status: 201, data: albumJson });
+})
+
+router.patch('/albums/year/:id', function(req, res) {
+    const albumId = req.params.id;
+    const year = req.body.year;
+    console.log(albumId, year)
+    const unqfy = service.getUNQfy()
+    const album = unqfy.changeAlbumYear(Number(albumId), year);
+    let albumJson = album.toJson()
+    service.saveUNQfy(unqfy)
+
+    res.json({ status: 200, data: albumJson });
+})
+
+
+router.delete('/albums/:id', function(req, res) {
+    const unqfy = service.getUNQfy()
+    unqfy.deleteAlbum(parseInt(req.params.id));
+    service.saveUNQfy(unqfy)
+
+    res.json({ status: 204, data: 'OK' });
+})
+
+
 router.post('/playlists/', function(req, res) {
     const unqfy = service.getUNQfy()
     const playList = unqfy.createPlaylist(req.body);
@@ -102,6 +162,7 @@ router.post('/playlists/', function(req, res) {
 
     res.status(201).json(playListJson)
 })
+
 
 router.post('/playlistsT/', function(req, res) {
 
@@ -158,6 +219,7 @@ router.delete('/playlists/:id', function(req, res) {
 
     res.status(204).json('OK')
 })
+
 
 app.use('/api', router);
 app.use((req, res) => {

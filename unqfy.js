@@ -197,6 +197,14 @@ class UNQfy {
         return (album);
     }
 
+    changeAlbumYear(id, year){
+        const album = this.getAlbumById(id);
+
+        album.year = year;
+
+        return album;
+    }
+
     deleteArtist(id) {
         const artistToDelete = this.getArtistById(id);
         const artistTracksIds = artistToDelete.getAllTracksIds()
