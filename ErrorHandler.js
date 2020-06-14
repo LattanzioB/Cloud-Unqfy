@@ -1,5 +1,6 @@
 const {
     NotFoundError,
+    AlreadyExistsError,
 } = require('./api/APIError');
 
 function ErrorHandler(err, req, res, next) {
@@ -8,6 +9,10 @@ function ErrorHandler(err, req, res, next) {
 
     switch (true) {
         case err instanceof NotFoundError:
+            res.status(err.status);
+            res.json({ status: err.status, errorCode: err.errorCode });
+            break;
+        case err instanceof AlreadyExistsError:
             res.status(err.status);
             res.json({ status: err.status, errorCode: err.errorCode });
             break;

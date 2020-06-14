@@ -9,10 +9,17 @@ class APIError extends Error {
 
 class NotFoundError extends APIError {
     constructor() {
-        super('NotFoundError', 400, 'RELATED_RESOURCE_NOT_FOUND');
+        super('NotFoundError', 404, 'RESOURCE_NOT_FOUND');
+    }
+}
+
+class AlreadyExistsError extends APIError {
+    constructor() {
+        super('AlreadyExistsError', 409, 'RESOURCE_ALREADY_EXISTS');
     }
 }
 
 module.exports = {
     NotFoundError,
+    AlreadyExistsError
 };

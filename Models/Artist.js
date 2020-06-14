@@ -16,10 +16,10 @@ class Artist {
     toJson() {
 
         let artista = {
-            id: this._id,
+            id: this.id,
             name: this.name,
+            albums: this._albums,
             country: this.country,
-            albums: this._albums
         }
 
         return artista

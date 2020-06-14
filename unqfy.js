@@ -17,6 +17,8 @@ const {
 const {
     ArtistInexistenteError,
 } = require('./api/APIError');
+const { LOADIPHLPAPI } = require('dns');
+const { log } = require('console');
 
 class UNQfy {
 
@@ -31,9 +33,7 @@ class UNQfy {
 
     createPlaylistByTracks({ name, tracks, maxDuration }) {
         const traksConcret = tracks.map(idTrack => this.getTrackById(idTrack));
-        console.log(traksConcret);
         const genresToInclude = traksConcret.map(track => track.genres);
-        console.log(genresToInclude);
 
         const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, traksConcret);
 
@@ -44,7 +44,7 @@ class UNQfy {
 
     getLyrics(trackId, musicMatchClient) {
         const tema = this.getTrackById(trackId);
-        console.log(tema);
+        console.log(tema.name);
         //refactor track.getLyrics
         if (!tema.lyrics.length) {
             return musicMatchClient
@@ -125,7 +125,7 @@ class UNQfy {
     //   albumData.name (string)
     //   albumData.year (number)
     // retorna: el nuevo album creado
-    addAlbum({ artistId, name, year }) {
+    addAlbum(artistId, { name, year }) {
         console.log(artistId);
 
         const checkAlbum = this.findAllAlbums().find(album => album.name == name);
@@ -175,6 +175,8 @@ class UNQfy {
     }
 
     getArtistById(id) {
+        console.log(id);
+
         const artist = this.artistList.find(artist => artist.id === id)
         if (!artist) {
             throw new ErrorNoExisteArtist;
@@ -224,29 +226,36 @@ class UNQfy {
         this.deleteTrackInPlayslistByID(id)
     }
 
+    deletePlayList(id) {
+        this.playLists = this.playLists.filter(playlist => playlist.id !== id);
+    }
+
     deleteTrackInPlayslistByID(id) {
         this.playLists.map(playlist => playlist.deleteTrackPlaylist(id))
     }
 
     getTrackById(id) {
         const artist = this.artistList.find(artist => artist.searchTrack(id));
-        console.log(artist);
-
         //agregar error artist
         const album = artist.searchTrack(id);
         //agregar error album
         const track = album.searchTrack(id);
         if (!track) {
-            console.log("NO HAY TRACK");
-
             throw new ErrorNoExisteTrack;
         }
         return track;
     }
 
     getPlaylistById(id) {
-        return this.listPlayList.find(playlist => playlist.id === id);
+        return this.playLists.find(playlist => playlist.id === id);
     }
+
+    //, durationLT, durationGT
+    getPlaylistByIdAndParams(name, durationLT, durationGT) {
+        return this.playLists.filter(playlist => playlist.name.toLowerCase().includes(name.toLowerCase()) &&
+            playlist.duration <= durationLT && playlist.duration >= durationGT);
+    }
+
 
     // genres: array de generos(strings)
     // retorna: los tracks que contenga alguno de los generos en el parametro genres
@@ -291,6 +300,7 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         console.log("REVISAR EL NOMBRE DE LOS PARAMETROS DESDE POSTMAN");
+        console.log(genresToInclude);
 
         const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
         const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400);
@@ -326,7 +336,7 @@ class UNQfy {
     }
 
     findAllArtistByName(name) {
-        return this.artistList.filter(artist => artist.name.includes(name));
+        return this.artistList.filter(artist => artist.name.toLowerCase().includes(name));
     }
 
     findAllAlbums() {
