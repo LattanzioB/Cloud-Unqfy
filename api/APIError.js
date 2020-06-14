@@ -37,11 +37,18 @@ class UnexpectedFailureError extends APIError {
     }
 }
 
+class InvalidJsonError extends APIError {
+    constructor() {
+        super('InvalidJsonError', 400, 'INVALID_JSON')
+    }
+}
+
 module.exports = {
     NotFoundError,
     NotFoundRelatedError,
     AlreadyExistError,
     BadRequestError,
-    UnexpectedFailureError
+    UnexpectedFailureError,
+    InvalidJsonError
 
 };

@@ -12,6 +12,7 @@ const {
     ErrorNoExisteAlbum,
     ErrorNoExisteTrack,
     ErrorAlbumRepetido,
+    ErrorParametrosInsuficientes,
 } = require('./Models/Errors');
 
 const {
@@ -100,13 +101,16 @@ class UNQfy {
     //   artistData.country (string)
     // retorna: el nuevo artista creado
     addArtist(artistData) {
+        if (!artistData.name || !artistData.country) {
+            throw new ErrorParametrosInsuficientes()
+        }
+
         const checkArtist = this.artistList.find(artist => artist.name === artistData.name)
 
         if (checkArtist) {
             throw new ErrorArtistaRepetido()
         }
         let newArtist = new Artist(artistData.name, artistData.country, this.nextIdArtist);
-        console.log(newArtist);
 
         this.artistList.push(newArtist)
         this.nextIdArtist++;
@@ -126,7 +130,14 @@ class UNQfy {
     //   albumData.year (number)
     // retorna: el nuevo album creado
     addAlbum({ artistId, name, year }) {
+
         console.log(artistId);
+
+
+        if (artistId === undefined || !name || !year) {
+            throw new ErrorParametrosInsuficientes()
+        }
+
 
         const checkAlbum = this.findAllAlbums().find(album => album.name == name);
 
@@ -297,7 +308,7 @@ class UNQfy {
     // genresToInclude: array de generos
     // maxDuration: duración en segundos
     // retorna: la nueva playlist creada
-    createPlaylist({ name, maxDuration, genresToInclude }) {
+    createPlaylist({ name, maxDuration, genres }) {
         /*** Crea una playlist y la agrega a unqfy. ***
           El objeto playlist creado debe soportar (al menos):
             * una propiedad name (string)
@@ -305,12 +316,12 @@ class UNQfy {
             * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
         */
         console.log("REVISAR EL NOMBRE DE LOS PARAMETROS DESDE POSTMAN");
-        console.log(genresToInclude);
+        console.log(genres);
 
-        const trakcsWithGenre = this.getTracksMatchingGenres(genresToInclude);
+        const trakcsWithGenre = this.getTracksMatchingGenres(genres);
         const trackListWithLimitTime = this.limitTracklistTime(trakcsWithGenre, 1400);
 
-        const playlist = new Playlist(this.nextIdPlayList, name, genresToInclude, maxDuration, trackListWithLimitTime);
+        const playlist = new Playlist(this.nextIdPlayList, name, genres, maxDuration, trackListWithLimitTime);
         this.nextIdPlayList++;
         this.playLists.push(playlist);
         return playlist;

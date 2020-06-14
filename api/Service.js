@@ -9,6 +9,7 @@ const {
     AlreadyExistError,
     BadRequestError,
     UnexpectedFailureError,
+    InvalidJsonError,
 } = require('./APIError');
 const {
     ErrorArtistaRepetido,
@@ -17,6 +18,7 @@ const {
     ErrorNoExisteAlbum,
     ErrorNoExisteTrack,
     ErrorAlbumRepetido,
+    ErrorParametrosInsuficientes,
 } = require('../Models/Errors');
 const { MusicMatchClient } = require('../Clients/MusicMatch');
 let port = process.env.PORT || 8080; // set our port
@@ -25,7 +27,13 @@ let bodyParser = require('body-parser');
 const { ErrorHandler } = require('./ErrorHandler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+
+try {
+    app.use(bodyParser.json());
+} catch (e) {
+    console.log(e);
+
+}
 
 router.get('/', function(req, res) {
     res.json({ message: 'funcionando' });
@@ -56,25 +64,37 @@ router.get('/artists/:id', function(req, res) {
 
 });
 
-router.post('/artists/', function(req, res) {
+router.post('/artists/', function(req, res, next) {
     try {
-
         const unqfy = service.getUNQfy()
         const artists = unqfy.addArtist(req.body)
         let artistJson = artists.toJson()
         service.saveUNQfy(unqfy)
 
         res.status(201).json(artistJson)
-    } catch {
-        throw new AlreadyExistError
+    } catch (e) {
+
+        if (e instanceof ErrorParametrosInsuficientes) {
+            next(new BadRequestError());
+
+        } else {
+            next(new AlreadyExistError)
+        }
+
     }
 })
 
-router.delete('/artists/:id', function(req, res) {
-    const unqfy = service.getUNQfy()
-    unqfy.deleteArtist(parseInt(req.params.id));
-    service.saveUNQfy(unqfy)
-    res.status(204).json('OK')
+router.delete('/artists/:id', function(req, res, next) {
+    try {
+        const unqfy = service.getUNQfy()
+        unqfy.deleteArtist(parseInt(req.params.id));
+        service.saveUNQfy(unqfy)
+        res.status(204).json('OK')
+    } catch (e) {
+        if (e instanceof ErrorNoExisteArtist) {
+            next(new NotFoundError)
+        }
+    }
 
 })
 
@@ -152,7 +172,10 @@ router.post('/albums/', function(req, res, next) {
         res.status(201).json(albumJson)
 
     } catch (e) {
-        if (e instanceof ErrorAlbumRepetido) {
+
+        if (e instanceof ErrorParametrosInsuficientes) {
+            next(new BadRequestError());
+        } else if (e instanceof ErrorAlbumRepetido) {
             next(new AlreadyExistError());
         } else if (e instanceof ErrorNoExisteArtist) {
             next(new NotFoundRelatedError());
@@ -191,33 +214,48 @@ router.delete('/albums/:id', function(req, res, next) {
 })
 
 
+// router.post('/playlists/', function(req, res) {
+//     const unqfy = service.getUNQfy()
+//     const playList = unqfy.createPlaylist(req.body);
+//     let playListJson = playList.toJson()
+//     service.saveUNQfy(unqfy)
+
+//     res.status(201).json(playListJson)
+// })
+
+
 router.post('/playlists/', function(req, res) {
-    const unqfy = service.getUNQfy()
-    const playList = unqfy.createPlaylist(req.body);
-    let playListJson = playList.toJson()
-    service.saveUNQfy(unqfy)
 
-    res.status(201).json(playListJson)
-})
+    if (req.body.name && req.body.tracks) {
+        console.log("primer if");
 
+        const unqfy = service.getUNQfy()
+        const playList = unqfy.createPlaylistByTracks(req.body);
+        let playListJson = playList.toJson()
+        let duration = unqfy.trackListDuration(playList.tracks)
+        console.log(duration);
 
-router.post('/playlistsT/', function(req, res) {
+        let playlist = {
+            id: playList.id,
+            name: playList.name,
+            duration: duration,
+            tracks: playList.tracks
+        }
 
-    const unqfy = service.getUNQfy()
-    const playList = unqfy.createPlaylistByTracks(req.body);
-    let playListJson = playList.toJson()
-    let duration = unqfy.trackListDuration(playList.tracks)
-    console.log(duration);
+        service.saveUNQfy(unqfy)
+        res.status(201).json(playlist)
 
-    let playlist = {
-        id: playList.id,
-        name: playList.name,
-        duration: duration,
-        tracks: playList.tracks
+    } else {
+        console.log("else");
+
+        const unqfy = service.getUNQfy()
+        const playList = unqfy.createPlaylist(req.body);
+        let playListJson = playList.toJson()
+        service.saveUNQfy(unqfy)
+
+        res.status(201).json(playListJson)
     }
 
-    service.saveUNQfy(unqfy)
-    res.status(201).json(playlist)
 
     // res.json({ status: 201, data: { message: "OK" } });
 

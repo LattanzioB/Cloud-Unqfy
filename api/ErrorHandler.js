@@ -34,7 +34,7 @@ function ErrorHandler(err, req, res, next) {
             break;
         case err.type === 'entity.parse.failed':
             res.status(err.status);
-            res.json({ status: err.status, errorCode: 'INVALID_JSON' });
+            res.json({ status: err.status, errorCode: 'BAD_REQUEST' });
             break;
         default:
             // code block

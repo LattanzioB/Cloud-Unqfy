@@ -5,6 +5,13 @@ class ErrorArtistaRepetido extends Error {
     }
 }
 
+class ErrorParametrosInsuficientes extends Error {
+    constructor() {
+        super("Error parametros insuficientes")
+        this.name = "ErrorParametrosInsuficientes"
+    }
+}
+
 class ErrorNoExisteArtist extends Error {
     constructor() {
         super("Error artista inexistente")
@@ -47,4 +54,5 @@ module.exports = {
     ErrorNoExisteAlbum,
     ErrorNoExisteTrack,
     ErrorAlbumRepetido,
+    ErrorParametrosInsuficientes,
 };
