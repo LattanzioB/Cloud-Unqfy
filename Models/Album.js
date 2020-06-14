@@ -11,6 +11,7 @@ class Album {
     get year() { return this._year }
     get tracks() { return this._tracks }
     set tracks(tracks) { return this._tracks = tracks }
+    set year(year) { return this._year = year }
 
     addTrack(track) {
         this._tracks.push(track);
