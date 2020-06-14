@@ -18,7 +18,7 @@ class Artist {
         let artista = {
             id: this.id,
             name: this.name,
-            albums: this._albums,
+            albums: this.albums.map(album => album.toJson()),
             country: this.country,
         }
 

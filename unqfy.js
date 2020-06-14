@@ -125,7 +125,7 @@ class UNQfy {
     //   albumData.name (string)
     //   albumData.year (number)
     // retorna: el nuevo album creado
-    addAlbum(artistId, { name, year }) {
+    addAlbum({ artistId, name, year }) {
         console.log(artistId);
 
         const checkAlbum = this.findAllAlbums().find(album => album.name == name);
@@ -135,6 +135,11 @@ class UNQfy {
         }
 
         const artist = this.getArtistById(artistId);
+
+        if (!artist) {
+            throw new ErrorNoExisteArtist()
+        }
+
         const newAlbum = new Album(this.nextIdAlbum, name, year);
         this.nextIdAlbum++;
         artist.addAlbum(newAlbum);
@@ -175,8 +180,6 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        console.log(id);
-
         const artist = this.artistList.find(artist => artist.id === id)
         if (!artist) {
             throw new ErrorNoExisteArtist;
@@ -185,21 +188,17 @@ class UNQfy {
     }
 
     getAlbumById(id) {
-        // console.log(this.artistList[0]);
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
 
-
-        const album = artistAlbum.searchAlbum(id);
-        if (!album) {
+        if (!artistAlbum) {
             throw new ErrorNoExisteAlbum;
-        } //console.log(artistAlbum.searchAlbum(id));
+        }
 
-        return (album);
+        return artistAlbum.searchAlbum(id);
     }
 
-    changeAlbumYear(id, year){
+    changeAlbumYear(id, year) {
         const album = this.getAlbumById(id);
-
         album.year = year;
 
         return album;
@@ -208,7 +207,6 @@ class UNQfy {
     deleteArtist(id) {
         const artistToDelete = this.getArtistById(id);
         const artistTracksIds = artistToDelete.getAllTracksIds()
-            //const tracksArtist = this.getArtistById(id).albums.flatMap(albums => albums.tracks)
         const albums = artistToDelete.albums
         albums.map(album => album.deleteAllTracks())
         artistToDelete.deleteAllAlbums()
@@ -218,7 +216,6 @@ class UNQfy {
     }
 
     deleteAlbum(id) {
-        //this.artistList.forEach(artist => artist.deleteAlbum(id));
         const artistAlbum = this.artistList.find(artist => artist.searchAlbum(id));
         const album = this.getAlbumById(id)
         const tracksIds = album.tracks.map(track => track.id)
@@ -352,7 +349,8 @@ class UNQfy {
     }
 
     findAllAlbumsByName(name) {
-        return this.findAllAlbums().filter(album => album.name.includes(name));
+        return this.findAllAlbums().filter(album => album.name.toLowerCase().includes(name.toLowerCase()));
+
     }
 
     findAllTracksByName(name) {

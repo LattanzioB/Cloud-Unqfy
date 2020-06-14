@@ -5,13 +5,24 @@ const serviceController = require('../controllers/ServiceController');
 const { flatMap } = require('lodash');
 const {
     NotFoundError,
-    AlreadyExistsError
+    NotFoundRelatedError,
+    AlreadyExistError,
+    BadRequestError,
+    UnexpectedFailureError,
 } = require('./APIError');
+const {
+    ErrorArtistaRepetido,
+    ErrorNoExisteArtist,
+    ErrorTrackRepetido,
+    ErrorNoExisteAlbum,
+    ErrorNoExisteTrack,
+    ErrorAlbumRepetido,
+} = require('../Models/Errors');
 const { MusicMatchClient } = require('../Clients/MusicMatch');
 let port = process.env.PORT || 8080; // set our port
 let service = new serviceController.ServiceController()
 let bodyParser = require('body-parser');
-const { ErrorHandler } = require('../ErrorHandler');
+const { ErrorHandler } = require('./ErrorHandler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -55,7 +66,7 @@ router.post('/artists/', function(req, res) {
 
         res.status(201).json(artistJson)
     } catch {
-        throw new AlreadyExistsError
+        throw new AlreadyExistError
     }
 })
 
@@ -98,13 +109,18 @@ router.get('/tracks/:id/lyrics/', function(req, res) {
 //********************************************************/
 
 router.get('/albums/', function(req, res) {
-    const albums = req.query.name ?
-        service.getUNQfy().findAllAlbumsByName(req.query.name) :
-        service.getUNQfy().findAllAlbums();
+    try {
 
-    let albumJson = albums.map(album => album.toJson())
+        const albums = req.query.name ?
+            service.getUNQfy().findAllAlbumsByName(req.query.name) :
+            service.getUNQfy().findAllAlbums();
 
-    res.json({ status: 200, data: albumJson });
+        let albumJson = albums.map(album => album.toJson())
+
+        res.status(200).json(albumJson)
+    } catch {
+        next(new NotFoundError());
+    }
 });
 
 
@@ -112,45 +128,66 @@ router.get('/albums/', function(req, res) {
 
 router.get('/albums/:id', function(req, res, next) {
     const albumId = req.params.id
-
-
     try {
         const album = service.getUNQfy().getAlbumById(albumId);
         let albumJson = album.toJson();
-        res.json({ status: 200, data: albumJson });
+        res.status(200).json(albumJson)
+
     } catch (e) {
         next(new NotFoundError());
     }
 });
 
-router.post('/albums/', function(req, res) {
-    const unqfy = service.getUNQfy()
-    const album = unqfy.addAlbum(req.body)
-    let albumJson = album.toJson()
-    service.saveUNQfy(unqfy)
+router.post('/albums/', function(req, res, next) {
+    try {
+        const unqfy = service.getUNQfy()
+        const album = unqfy.addAlbum(req.body)
+        let albumJson = album.toJson()
+        console.log("IMPORTA");
 
-    res.json({ status: 201, data: albumJson });
+        console.log(albumJson);
+
+        service.saveUNQfy(unqfy)
+
+        res.status(201).json(albumJson)
+
+    } catch (e) {
+        if (e instanceof ErrorAlbumRepetido) {
+            next(new AlreadyExistError());
+        } else if (e instanceof ErrorNoExisteArtist) {
+            next(new NotFoundRelatedError());
+        }
+
+    }
 })
 
-router.patch('/albums/year/:id', function(req, res) {
-    const albumId = req.params.id;
-    const year = req.body.year;
-    console.log(albumId, year)
-    const unqfy = service.getUNQfy()
-    const album = unqfy.changeAlbumYear(Number(albumId), year);
-    let albumJson = album.toJson()
-    service.saveUNQfy(unqfy)
+router.patch('/albums/:id', function(req, res, next) {
+    try {
+        const albumId = req.params.id;
+        const year = req.body.year;
+        console.log(albumId, year)
+        const unqfy = service.getUNQfy()
+        const album = unqfy.changeAlbumYear(Number(albumId), year);
+        let albumJson = album.toJson()
+        service.saveUNQfy(unqfy)
 
-    res.json({ status: 200, data: albumJson });
+        res.status(200).json(albumJson)
+    } catch {
+        next(new NotFoundError());
+    }
 })
 
 
-router.delete('/albums/:id', function(req, res) {
-    const unqfy = service.getUNQfy()
-    unqfy.deleteAlbum(parseInt(req.params.id));
-    service.saveUNQfy(unqfy)
+router.delete('/albums/:id', function(req, res, next) {
+    try {
+        const unqfy = service.getUNQfy()
+        unqfy.deleteAlbum(parseInt(req.params.id));
+        service.saveUNQfy(unqfy)
 
-    res.json({ status: 204, data: 'OK' });
+        res.status(204).json('OK')
+    } catch {
+        next(new NotFoundError());
+    }
 })
 
 

@@ -35,7 +35,6 @@ class Album {
     }
 
     toJson() {
-
         let album = {
             id: this._id,
             name: this._name,
