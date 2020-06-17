@@ -117,9 +117,8 @@ function main() {
         command.invoke(args, unqFy)
         console.log(nameFunction);
 
-        if (nameFunction != "getLyrics") {
+        if (nameFunction != "getLyrics" && nameFunction != "populateAlbumsForArtist") {
             console.log(nameFunction);
-            console.log("ENTRANDerewrO EN EL IF ----------------------------------------------------------");
             saveUNQfy(unqFy);
         }
 
