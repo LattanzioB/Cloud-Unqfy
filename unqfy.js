@@ -39,7 +39,7 @@ class UNQfy {
         const subject = `Nuevo Album del artsta ${artist.name} `;
         const message = `Se agrego el album ${album.name} al artista ${artist.name}`;
         const suscriptorsEmail = artist.suscriptors.map(suscriptors => suscriptors.email);
-        const notifyClient = new NotifyClient();
+        const notifyClient = new Notify();
         notifyClient.send(suscritoresEmail, subject, message);
     }
 
