@@ -5,6 +5,7 @@ class Artist {
         this._name = name;
         this._country = country;
         this._albums = [];
+        this._suscriptors = [];
     }
 
     get name() { return this._name }
@@ -12,6 +13,24 @@ class Artist {
     get id() { return this._id }
     get albums() { return this._albums }
     set albums(albums) { return this._albums = albums }
+
+    get suscriptors() { return this._suscriptors }
+
+    isSuscritor(suscriptor) {
+        return this._suscriptors.find(aSuscriptor => aSuscriptor.email === suscriptor);
+    }
+
+    clearSubscriptors() {
+        this._suscriptors = [];
+    }
+
+    addSuscriptor(suscriptor) {
+        this._suscriptors.push(suscriptor);
+    }
+
+    unsubscribe(emailSuscriptor) {
+        this._suscriptors = this._suscriptors.filter(aSuscriptor => aSuscriptor.name !== emailSuscriptor);
+    }
 
     toJson() {
 

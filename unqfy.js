@@ -5,6 +5,8 @@ const { Album } = require('./Models/Album');
 const { Track } = require('./Models/Track');
 const { Playlist } = require('./Models/Playlist');
 const { flatMap } = require('lodash');
+const { Notify } = require('./Clients/Notify');
+
 const {
     ErrorArtistaRepetido,
     ErrorNoExisteArtist,
@@ -30,7 +32,30 @@ class UNQfy {
         this.nextIdPlayList = 0;
         this.nextIdTrack = 0;
         this.nextIdAlbum = 0;
+        this.userList = [];
     }
+
+    notify(artist, album) {
+        const subject = `Nuevo Album del artsta ${artist.name} `;
+        const message = `Se agrego el album ${album.name} al artista ${artist.name}`;
+        const suscriptorsEmail = artist.suscriptors.map(suscriptors => suscriptors.email);
+        const notifyClient = new Notify();
+        notifyClient.send(suscritoresEmail, subject, message);
+    }
+
+    suscribe(artistId, email) {
+        const artist = this.getArtistById(artistId);
+        if (!artist.isSuscritor(email)) {
+            const user = this.userList.find(user => user.email === email);
+            artist.addSuscriptor(user);
+        }
+    }
+
+    unsubscribe(artistId, email) {
+        const artist = this.getArtistById(artistId);
+        artist.unsubscribe(email);
+        return artist;
+      }
 
     createPlaylistByTracks({ name, tracks, maxDuration }) {
         const traksConcret = tracks.map(idTrack => this.getTrackById(idTrack));
