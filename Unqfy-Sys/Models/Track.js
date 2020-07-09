@@ -28,8 +28,19 @@ class Track {
     }
 
     getLyrics() {
-        return this.lyrics;
+        console.log(tema.name);
+        //refactor track.getLyrics
+        if (!this.lyrics.length) {
+            return musicMatchClient
+                .searchTrackId(tema.name)
+                .then(respuestaID => musicMatchClient.getTrackLyrics(respuestaID))
+                .then(respuestaLyrics => tema.setLyrics(respuestaLyrics));
+        } else {
+            return this.lyrics;
+        }
     }
+
+
 }
 
 

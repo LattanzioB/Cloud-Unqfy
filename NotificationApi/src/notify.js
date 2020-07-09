@@ -16,6 +16,7 @@ class Notification {
         )
     }
 
+    
     removeSuscriptor(emailToDesuscribe, artistIDToDesuscribe){
         this._suscriptors = this._suscriptors.filter(
             item => item.email !== emailToDesuscribe && item.artistId !== artistIDToDesuscribe)

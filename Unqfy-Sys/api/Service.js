@@ -2,7 +2,6 @@ let express = require('express'); // import express
 let app = express(); // define our app using express
 let router = express.Router();
 const serviceController = require('../controllers/ServiceController');
-const { flatMap } = require('lodash');
 const {
     NotFoundError,
     NotFoundRelatedError,
@@ -32,7 +31,6 @@ try {
     app.use(bodyParser.json());
 } catch (e) {
     console.log(e);
-
 }
 
 router.get('/', function(req, res) {

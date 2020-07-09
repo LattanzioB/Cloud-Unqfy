@@ -25,6 +25,36 @@ class Artist {
         return artista
     }
 
+
+    update(name, country){
+        this._name = name;
+        this._country = country;
+
+        return artist;
+    }
+
+    populateAlbums(spotifyClient){
+    return spotifyClient.getArtistByName(artist.name)
+    .then(idArtistSpotify => spotifyClient.populateAlbumsForArtist(idArtistSpotify))
+    .then(albums => {
+        albums.forEach(element => {
+            this.addAlbumNoObject(this.id, element.name, element.release_date);
+
+        });
+        // console.log(albums);
+
+    })
+    .catch(error => console.log(error));
+    }
+
+    addAlbumNoObject(artistId, name, year) {
+        const artist = this.getArtistById(artistId);
+        const album = new Album(this.nextIdAlbum, name, year);
+        artist.addAlbum(album);
+        this.nextIdAlbum++;
+        return album;
+    }
+
     addAlbum(album) {
         this._albums.push(album)
     }

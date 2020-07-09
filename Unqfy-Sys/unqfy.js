@@ -44,52 +44,26 @@ class UNQfy {
     }
 
     getLyrics(trackId, musicMatchClient) {
-        const tema = this.getTrackById(trackId);
-        console.log(tema.name);
-        //refactor track.getLyrics
-        if (!tema.lyrics.length) {
-            return musicMatchClient
-                .searchTrackId(tema.name)
-                .then(respuestaID => musicMatchClient.getTrackLyrics(respuestaID))
-                .then(respuestaLyrics => tema.setLyrics(respuestaLyrics));
-        } else {
-            return tema.lyrics;
-        }
+        const track = this.getTrackById(trackId);
+
+        return track.getLyrics(musicMatchClient)
+
     }
 
     populateAlbumsForArtist(artistId, spotifyClient) {
-        const artistName = this.getArtistById(artistId).name;
-
-        return spotifyClient.getArtistByName(artistName)
-            .then(idArtistSpotify => spotifyClient.populateAlbumsForArtist(idArtistSpotify))
-            .then(albums => {
-                albums.forEach(element => {
-                    this.addAlbumNoObject(artistId, element.name, element.release_date);
-
-                });
-                // console.log(albums);
-
-            })
-            .catch(error => console.log(error));
+        const artist = this.getArtistById(artistId)
+        return artist.populateAlbums(spotifyClient)
     }
 
-    addAlbumNoObject(artistId, name, year) {
-        const artist = this.getArtistById(artistId);
-        const album = new Album(this.nextIdAlbum, name, year);
-        artist.addAlbum(album);
-        this.nextIdAlbum++;
-        return album;
-    }
+
 
     updateArtist(id, { name, country }) {
         const artist = this.getArtistById(id);
         if (!artist) {
             throw new ErrorNoExisteArtist();
         }
-        artist._name = name;
-        artist._country = country;
-
-        return artist;
+        return artist.update(name, country)
+    
     }
 
     getAllArtist() {

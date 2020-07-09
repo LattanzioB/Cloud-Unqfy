@@ -25,7 +25,7 @@ function createMessage() {
     const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
     const messageParts = [
       'From: Lautaro Woites <lautaro.woites@gmail.com>',
-      'To: Lautaro Woites <lautaro.woites@gmail.com>',
+      'To: Lautaro Woites <brunoj.lattanzio@gmail.com>',
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
