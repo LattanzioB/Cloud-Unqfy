@@ -3,35 +3,34 @@ const promisify = require('util').promisify;
 const {google} = require('googleapis');
 const getGmailClient = require('./gmailClient');
 
-
-// Obtiene un objeto JJJJJ a partir del credentials.json y token.json
 const gmailClient = getGmailClient();
 
-// Envia un mail, utilizando la funcion ZZZZ que termina haciendo un request a XXXXX
-gmailClient.users.messages.send(
-  {
-    userId: 'me',
-    requestBody: {
-      raw: createMessage(),
-    },
-  }
-);
 
+exports.sendMail = (email, subject, message) => {
+  console.log("LLEGO A SEND MAIL");
+  
+    gmailClient.users.messages.send(
+      {
+        userId: 'me',
+        requestBody: {
+          raw: createMessage(email, subject, message),
+        },
+      }
+    );
+}
 
-function createMessage() {
+const createMessage = (email, subject, content) => {
     // You can use UTF-8 encoding for the subject using the method below.
     // You can also just use a plain string if you don't need anything fancy.
-    const subject = 'Hello';
     const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
     const messageParts = [
       'From: Lautaro Woites <lautaro.woites@gmail.com>',
-      'To: Lautaro Woites <brunoj.lattanzio@gmail.com>',
+      `To: <${email}>`,
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
       `Subject: ${utf8Subject}`,
       '',
-      'This is a message just to say hello.',
-      'So... <b>Hello!</b> ❤️😎',
+      content
     ];
     const message = messageParts.join('\n');
   

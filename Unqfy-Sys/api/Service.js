@@ -34,7 +34,9 @@ try {
 }
 
 router.get('/', function(req, res) {
-    res.json({ message: 'funcionando' });
+    console.log("fnucionando de unqyfy");
+    
+    res.json({ message: 'funcionando desde unqfy' });
 });
 
 router.get('/artists/', function(req, res) {
@@ -302,5 +304,7 @@ app.use((req, res) => {
         errorCode: 'RESOURCE_NOT_FOUND'
     });
 });
+console.log(port);
+
 app.use(ErrorHandler);
 app.listen(port);
