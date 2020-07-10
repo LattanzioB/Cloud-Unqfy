@@ -1,4 +1,5 @@
 let express = require('express'); // import express
+let { Notification } = require('./notify')
 let app = express(); // define our app using express
 let router = express.Router();
 const {
@@ -21,10 +22,68 @@ try {
     console.log(e);
 }
 
+let notify = new Notification()
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     res.json({ message: 'funcionando' });
 });
+
+router.post('/suscribe/', function (req, res) {
+    notify.addSuscriptor(req.body.artistId, req.body.email)
+    res.status(200).json("")
+});
+
+
+router.get('/subscriptions/', function (req, res) {
+    console.log(req.query.artistId);
+    
+    try {
+        const suscriptors = notify.getSuscriptorsByArtistId(req.query.artistId)
+        res.status(200).json(suscriptors)
+    } catch {
+        throw new NotFoundError
+    }
+
+});
+
+// router.get('/subscriptions/:artistId', function (req, res) {
+//     try {
+//         const suscriptors = notify.suscriptors
+//         res.status(200).json(suscriptors)
+//     } catch {
+//         throw new NotFoundError
+//     }
+
+// });
+
+router.post('/unsubscribe/', function (req, res, next) {
+    try {
+        console.log(req.body.artistId);
+        
+        notify.removeSuscriptor(req.body.artistId, req.body.email)
+        res.status(200).json("OK")
+    } catch (e) {
+        if (e instanceof ErrorNoExisteArtist) {
+            next(new NotFoundError)
+        }
+    }
+
+})
+
+
+router.delete('/subscriptions/', function (req, res, next) {
+    try {
+
+        notify.deleteEmailsFromArtist(req.body.artistId)
+        res.status(204).json('OK')
+    } catch (e) {
+        if (e instanceof ErrorNoExisteArtist) {
+            next(new NotFoundError)
+        }
+    }
+
+})
+
 
 
 
@@ -37,5 +96,5 @@ app.use((req, res) => {
     });
 });
 app.use(ErrorHandler);
-console.log("Api On");
+console.log(port);
 app.listen(port);

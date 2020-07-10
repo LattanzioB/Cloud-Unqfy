@@ -1,30 +1,49 @@
-
-
 class Notification {
 
-    constructor(){
+    constructor() {
         this._suscriptors = [];
     }
 
-    addSuscriptor(emailToSuscribe, artistIDToSuscribe){
+    get suscriptors() { return this._suscriptors }
+
+
+    getSuscriptorsByArtistId(artistId) {
+        let suscriptorsG = this.suscriptors.filter(sus => sus.artistId == artistId)
+
+        let suscriptors = {
+            artistId: artistId,
+            subscriptors: suscriptorsG.map(sus => sus.email)
+        }
+        return suscriptors
+    }
+
+    addSuscriptor(artistIDToSuscribe, emailToSuscribe) {
+        console.log(artistIDToSuscribe);
+        console.log(emailToSuscribe);
+
+
         this._suscriptors.push(
             {
-                email: emailToSuscribe,
-                artistId: artistIDToSuscribe
-
+                artistId: artistIDToSuscribe,
+                email: emailToSuscribe
             }
         )
     }
 
-    
-    removeSuscriptor(emailToDesuscribe, artistIDToDesuscribe){
+    //REVISAR FUNCIONA MAL
+    removeSuscriptor(artistIDToDesuscribe, emailToDesuscribe) {
         this._suscriptors = this._suscriptors.filter(
-            item => item.email !== emailToDesuscribe && item.artistId !== artistIDToDesuscribe)
-    }
+            item => item.email !== emailToDesuscribe || item.artistId !== artistIDToDesuscribe)
+        }
 
-    removeArtist(artistIDToDesuscribe){
+    deleteEmailsFromArtist(artistIDToDesuscribe) {
+        // no quedaria ningun artist id, ya que no quedarian suscriptores para el artista
         this._suscriptors = this._suscriptors.filter(item => item.artistId !== artistIDToDesuscribe)
     }
 
-    
+
 }
+
+module.exports = {
+    Notification
+};
