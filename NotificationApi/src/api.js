@@ -11,10 +11,7 @@ const {
   InvalidJsonError
 } = require("./APIError");
 const { ErrorHandler } = require("./ErrorHandler");
-const {
-  getOK,
-  seBuscaArtistaPorNombreYSeObtieneId
-} = require("./clients/UnqfyClient");
+const { getOK, searchArtistByNameAndGetId } = require("./clients/UnqfyClient");
 let port = process.env.PORT || 8081; // set our port
 let bodyParser = require("body-parser");
 
@@ -40,7 +37,7 @@ router.get("/verifyConnection/", function(req, res) {
 //-----------------------------------------------------------------------------------------------
 
 router.post("/suscribeArtistName/:name", function(req, res) {
-  seBuscaArtistaPorNombreYSeObtieneId(req.params.name).then(data => {
+  searchArtistByNameAndGetId(req.params.name).then(data => {
     notify.addSuscriptor(data.id, req.body.email);
   });
 
@@ -56,7 +53,7 @@ router.post("/suscribe/", function(req, res) {
 
 router.post("/unsubscribe/:name", function(req, res, next) {
   try {
-    seBuscaArtistaPorNombreYSeObtieneId(req.params.name).then(data => {
+    searchArtistByNameAndGetId(req.params.name).then(data => {
       notify.removeSuscriptor(data.id, req.body.email);
     });
     res.status(200).json("OK");

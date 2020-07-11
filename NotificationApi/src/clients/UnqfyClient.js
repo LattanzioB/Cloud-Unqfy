@@ -15,7 +15,7 @@ exports.getOK = () => {
     .catch(error => console.log(error));
 };
 
-exports.seBuscaArtistaPorNombreYSeObtieneId = artistName => {
+exports.searchArtistByNameAndGetId = artistName => {
   const options = {
     uri: `http://localhost:8080/api/idArtistByName/${artistName}`,
     // qs: {
