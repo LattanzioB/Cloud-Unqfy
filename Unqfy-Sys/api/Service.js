@@ -103,6 +103,7 @@ router.delete('/artists/:id', function(req, res, next) {
         const unqfy = service.getUNQfy()
         unqfy.deleteArtist(parseInt(req.params.id));
         service.saveUNQfy(unqfy)
+        notify.deleteArtist(parseInt(req.params.id))
         res.status(204).json('OK')
     } catch (e) {
         if (e instanceof ErrorNoExisteArtist) {
@@ -182,6 +183,10 @@ router.post('/albums/', function(req, res, next) {
         console.log(albumJson);
 
         service.saveUNQfy(unqfy)
+        notify.notify(req.body.artistId,
+            `New Album!`,
+            `One of your favorite artist released a new Album called ${req.body.name}, 
+            find out who in Unqfy!!`)
 
         res.status(201).json(albumJson)
 
