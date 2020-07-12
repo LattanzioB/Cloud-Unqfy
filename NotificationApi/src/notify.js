@@ -31,7 +31,6 @@ class Notification {
     });
   }
 
-  //REVISAR FUNCIONA MAL
   removeSuscriptor(artistIDToDesuscribe, emailToDesuscribe) {
     this._suscriptors = this._suscriptors.filter(
       item =>

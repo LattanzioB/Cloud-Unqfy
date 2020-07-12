@@ -165,7 +165,15 @@ class UNQfy {
     }
 
     getArtistById(id) {
-        const artist = this.artistList.find(artist => artist.id === id)
+        console.log("HOLAAAAAAAAAAA");
+        
+        console.log(this.artistList);
+        console.log("HOLAAAAAAAAAAA");
+
+        
+        const artist = this.artistList.find(artist => artist.id == id)
+        console.log(artist);
+        
         if (!artist) {
             throw new ErrorNoExisteArtist;
         }
@@ -262,6 +270,11 @@ class UNQfy {
     // artistName: nombre de artista(string)
     // retorna: los tracks interpredatos por el artista con nombre artistName
     getArtistByName(artistName) {
+        console.log("HOLAAAAAAAAAAAAAAAA");
+        console.log(artistName);
+        
+        console.log(this.artistList);
+        
         const artist = this.artistList.find(artist => artist.name == artistName);
         if (artist == undefined) {
             throw new ErrorNoExisteArtist;

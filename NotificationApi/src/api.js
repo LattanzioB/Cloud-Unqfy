@@ -11,7 +11,7 @@ const {
   InvalidJsonError
 } = require("./APIError");
 const { ErrorHandler } = require("./ErrorHandler");
-const { getOK, searchArtistByNameAndGetId } = require("./clients/UnqfyClient");
+const { getOK, searchArtistId } = require("./clients/UnqfyClient");
 let port = process.env.PORT || 8081; // set our port
 let bodyParser = require("body-parser");
 
@@ -36,24 +36,19 @@ router.get("/verifyConnection/", function(req, res) {
 
 //-----------------------------------------------------------------------------------------------
 
-router.post("/suscribeArtistName/:name", function(req, res) {
-  searchArtistByNameAndGetId(req.params.name).then(data => {
+router.post("/suscribe/", function(req, res) {
+  searchArtistId(req.body.artistId).then(data => {
     notify.addSuscriptor(data.id, req.body.email);
   });
 
-  res.status(200).json("");
-});
-
-router.post("/suscribe/", function(req, res) {
-  notify.addSuscriptor(req.body.artistId, req.body.email);
-  res.status(200).json("");
+  res.status(200).json("OK");
 });
 
 //-----------------------------------------------------------------------------------------------
 
-router.post("/unsubscribe/:name", function(req, res, next) {
+router.post("/unsubscribe/", function(req, res, next) {
   try {
-    searchArtistByNameAndGetId(req.params.name).then(data => {
+    searchArtistId(req.body.artistId).then(data => {
       notify.removeSuscriptor(data.id, req.body.email);
     });
     res.status(200).json("OK");
@@ -64,16 +59,6 @@ router.post("/unsubscribe/:name", function(req, res, next) {
   }
 });
 
-router.post("/unsubscribe/", function(req, res, next) {
-  try {
-    notify.removeSuscriptor(req.body.artistId, req.body.email);
-    res.status(200).json("OK");
-  } catch (e) {
-    if (e instanceof ErrorNoExisteArtist) {
-      next(new NotFoundError());
-    }
-  }
-});
 
 //-----------------------------------------------------------------------------------------------
 

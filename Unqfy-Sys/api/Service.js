@@ -33,6 +33,20 @@ try {
     console.log(e);
 }
 
+
+router.get('/idArtist/:id', function(req, res) {
+    try {
+        console.log(req.params.id);
+        
+        const artist = service.getUNQfy().getArtistById(req.params.id)
+        let artistJson = artist.toJson()
+        res.status(200).json(artistJson)
+    } catch {
+        throw new NotFoundError
+    }
+
+});
+
 router.get('/', function(req, res) {
     console.log("fnucionando de unqyfy");
     
