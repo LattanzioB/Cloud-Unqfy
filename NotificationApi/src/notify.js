@@ -14,17 +14,10 @@ class Notification {
   getSuscriptorsByArtistId(artistId) {
     let suscriptorsG = this.suscriptors.filter(sus => sus.artistId == artistId);
 
-    let suscriptors = {
-      artistId: artistId,
-      subscriptors: suscriptorsG.map(sus => sus.email)
-    };
-    return suscriptors;
+    return suscriptorsG.map(sus => sus.email)
   }
 
   addSuscriptor(artistIDToSuscribe, emailToSuscribe) {
-    console.log(artistIDToSuscribe);
-    console.log(emailToSuscribe);
-
     this._suscriptors.push({
       artistId: artistIDToSuscribe,
       email: emailToSuscribe
@@ -47,8 +40,7 @@ class Notification {
   }
 
   sendMail(artistId, subject, message) {
-    let listaEmails = this.getSuscriptorsByArtistId(artistId).subscriptors;
-    console.log(listaEmails);
+    let listaEmails = this.getSuscriptorsByArtistId(artistId);
     listaEmails.forEach(email => {
       sendMail(email, subject, message);
     });

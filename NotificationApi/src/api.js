@@ -11,7 +11,7 @@ const {
   InvalidJsonError
 } = require("./APIError");
 const { ErrorHandler } = require("./ErrorHandler");
-const { getOK, searchArtistId } = require("./clients/UnqfyClient");
+const { getOK, searchArtistByName } = require("./clients/UnqfyClient");
 let port = process.env.PORT || 8081; // set our port
 let bodyParser = require("body-parser");
 
@@ -36,19 +36,25 @@ router.get("/verifyConnection/", function(req, res) {
 
 //-----------------------------------------------------------------------------------------------
 
-router.post("/suscribe/", function(req, res) {
-  searchArtistId(req.body.artistId).then(data => {
+router.post("/suscribeArtistName/:name", function(req, res) {
+  searchArtistByName(req.params.name).then(data => {
+    console.log(data.id)
     notify.addSuscriptor(data.id, req.body.email);
   });
 
-  res.status(200).json("OK");
+  res.status(200).json("");
+});
+
+router.post("/suscribe/", function(req, res) {
+  notify.addSuscriptor(req.body.artistId, req.body.email);
+  res.status(200).json("");
 });
 
 //-----------------------------------------------------------------------------------------------
 
-router.post("/unsubscribe/", function(req, res, next) {
+router.post("/unsubscribe/:name", function(req, res, next) {
   try {
-    searchArtistId(req.body.artistId).then(data => {
+    searchArtistByName(req.params.name).then(data => {
       notify.removeSuscriptor(data.id, req.body.email);
     });
     res.status(200).json("OK");
@@ -59,14 +65,24 @@ router.post("/unsubscribe/", function(req, res, next) {
   }
 });
 
+router.post("/unsubscribe/", function(req, res, next) {
+  try {
+    notify.removeSuscriptor(req.body.artistId, req.body.email);
+    res.status(200).json("OK");
+  } catch (e) {
+    if (e instanceof ErrorNoExisteArtist) {
+      next(new NotFoundError());
+    }
+  }
+});
 
 //-----------------------------------------------------------------------------------------------
 
 router.get("/subscriptions/", function(req, res) {
-  console.log(req.query.artistId);
+
 
   try {
-    const suscriptors = notify.getSuscriptorsByArtistId(req.query.artistId);
+    const suscriptors = ((req.query.artistId)? notify.getSuscriptorsByArtistId(req.query.artistId) : notify.suscriptors);
     res.status(200).json(suscriptors);
   } catch {
     throw new NotFoundError();
@@ -74,8 +90,10 @@ router.get("/subscriptions/", function(req, res) {
 });
 
 router.delete("/subscriptions/", function(req, res, next) {
+  console.log("deleteNoti")
+  console.log(req.query);
   try {
-    notify.deleteEmailsFromArtist(req.body.artistId);
+    notify.deleteEmailsFromArtist(Number(req.query.artistId));
     res.status(204).json("OK");
   } catch (e) {
     if (e instanceof ErrorNoExisteArtist) {
@@ -85,8 +103,10 @@ router.delete("/subscriptions/", function(req, res, next) {
 });
 
 router.post("/notify/", function(req, res, next) {
+  console.log("apinotify")
+
   try {
-    notify.sendMail(req.body.artistId, req.body.subject, req.body.message);
+    notify.sendMail(Number(req.query.artistId), req.query.subject, req.query.message);
     res.status(200).json("OK");
   } catch (e) {
     if (e instanceof ErrorNoExisteArtist) {

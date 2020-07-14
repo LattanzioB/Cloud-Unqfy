@@ -20,6 +20,8 @@ const {
     ErrorParametrosInsuficientes,
 } = require('../Models/Errors');
 const { MusicMatchClient } = require('../Clients/MusicMatch');
+const { NotifyClient } = require('../Clients/NotifyClient');
+let notify = new NotifyClient();
 let port = process.env.PORT || 8080; // set our port
 let service = new serviceController.ServiceController()
 let bodyParser = require('body-parser');
@@ -41,7 +43,7 @@ router.get('/idArtist/:id', function(req, res) {
         const artist = service.getUNQfy().getArtistById(req.params.id)
         let artistJson = artist.toJson()
         res.status(200).json(artistJson)
-    } catch {
+    } catch(e){
         throw new NotFoundError
     }
 
@@ -61,7 +63,7 @@ router.get('/artists/', function(req, res) {
 
         let artistJson = artists.map(artist => artist.toJson())
         res.status(200).json(artistJson)
-    } catch {
+    } catch(e) {
         throw new NotFoundError
     }
 });
@@ -72,7 +74,7 @@ router.get('/artists/:id', function(req, res) {
         let artistJson = artist.toJson()
         res.status(200).json(artistJson)
 
-    } catch {
+    } catch(e) {
         throw new NotFoundError
     }
 
@@ -133,7 +135,7 @@ router.get('/tracks/:id/lyrics/', function(req, res) {
             lyric: lyrics,
         }
         res.status(200).json(lyric)
-    } catch {
+    } catch(e) {
         throw new NotFoundError
 
     }
@@ -153,7 +155,7 @@ router.get('/albums/', function(req, res) {
         let albumJson = albums.map(album => album.toJson())
 
         res.status(200).json(albumJson)
-    } catch {
+    } catch(e) {
         next(new NotFoundError());
     }
 });
@@ -214,7 +216,7 @@ router.patch('/albums/:id', function(req, res, next) {
         service.saveUNQfy(unqfy)
 
         res.status(200).json(albumJson)
-    } catch {
+    } catch(e) {
         next(new NotFoundError());
     }
 })
@@ -227,7 +229,7 @@ router.delete('/albums/:id', function(req, res, next) {
         service.saveUNQfy(unqfy)
 
         res.status(204).json('OK')
-    } catch {
+    } catch(e) {
         next(new NotFoundError());
     }
 })
@@ -288,7 +290,7 @@ router.get('/playlists/:id', function(req, res) {
         let playListJson = playList.toJson()
         res.status(200).json(playListJson)
 
-    } catch {
+    } catch(e) {
         throw new NotFoundError
     }
 
@@ -300,7 +302,7 @@ router.get('/playlistsP/', function(req, res) {
         const playList = unqfy.getPlaylistByIdAndParams(req.query.name, req.query.durationLT, req.query.durationGT)
 
         res.status(200).json(playList)
-    } catch {
+    } catch(e) {
         throw new NotFoundError
     }
 
