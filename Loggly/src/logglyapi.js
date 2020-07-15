@@ -30,7 +30,7 @@ let logglyModel = new LogglyModel
 
 router.post("/newLog/", function(req, res) {
     
-    logglyModel.log(req.body.status, req.body.message)
+    logglyModel.log(req.query.status, req.query.message)
     
   
     res.status(200).json("OK");
