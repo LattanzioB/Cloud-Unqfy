@@ -90,8 +90,6 @@ router.get("/subscriptions/", function(req, res) {
 });
 
 router.delete("/subscriptions/", function(req, res, next) {
-  console.log("deleteNoti")
-  console.log(req.query);
   try {
     notify.deleteEmailsFromArtist(Number(req.query.artistId));
     res.status(204).json("OK");

@@ -21,7 +21,9 @@ const {
 } = require('../Models/Errors');
 const { MusicMatchClient } = require('../Clients/MusicMatch');
 const { NotifyClient } = require('../Clients/NotifyClient');
+const { LogglyClient } = require('../Clients/LogglyClient');
 let notify = new NotifyClient();
+let loggly = new LogglyClient();
 let port = process.env.PORT || 8080; // set our port
 let service = new serviceController.ServiceController()
 let bodyParser = require('body-parser');
@@ -87,6 +89,7 @@ router.post('/artists/', function(req, res, next) {
         let artistJson = artists.toJson()
         service.saveUNQfy(unqfy)
 
+        loggly.log("info", `New Artist ${req.body.name} is now on Unqfy`)
         res.status(201).json(artistJson)
     } catch (e) {
 
@@ -106,6 +109,7 @@ router.delete('/artists/:id', function(req, res, next) {
         unqfy.deleteArtist(parseInt(req.params.id));
         service.saveUNQfy(unqfy)
         notify.deleteArtist(parseInt(req.params.id))
+        loggly.log("info", `Artist deleted from Unqfy`)
         res.status(204).json('OK')
     } catch (e) {
         if (e instanceof ErrorNoExisteArtist) {
@@ -120,6 +124,7 @@ router.put('/artists/:id', function(req, res) {
     const artist = unqfy.updateArtist(parseInt(req.params.id), req.body);
     let artistJson = artist.toJson()
     service.saveUNQfy(unqfy)
+    loggly.log("info", `Artist ${req.body.name} modified on Unqfy`)
     res.status(200).json(artistJson)
 
 })
@@ -190,6 +195,8 @@ router.post('/albums/', function(req, res, next) {
             `One of your favorite artist released a new Album called ${req.body.name}, 
             find out who in Unqfy!!`)
 
+        loggly.log("info", `New Album ${req.body.name} is now on Unqfy`)
+
         res.status(201).json(albumJson)
 
     } catch (e) {
@@ -215,6 +222,8 @@ router.patch('/albums/:id', function(req, res, next) {
         let albumJson = album.toJson()
         service.saveUNQfy(unqfy)
 
+        loggly.log("info", `Album ${req.body.name} modified on Unqfy`)
+
         res.status(200).json(albumJson)
     } catch(e) {
         next(new NotFoundError());
@@ -227,6 +236,8 @@ router.delete('/albums/:id', function(req, res, next) {
         const unqfy = service.getUNQfy()
         unqfy.deleteAlbum(parseInt(req.params.id));
         service.saveUNQfy(unqfy)
+
+        loggly.log("info", `Album deleted from Unqfy`)
 
         res.status(204).json('OK')
     } catch(e) {
@@ -264,6 +275,8 @@ router.post('/playlists/', function(req, res) {
         }
 
         service.saveUNQfy(unqfy)
+
+        loggly.log("info", `New Playlist ${req.body.name} is now on Unqfy`)
         res.status(201).json(playlist)
 
     } else {
@@ -313,6 +326,7 @@ router.delete('/playlists/:id', function(req, res) {
     const playList = unqfy.deletePlayList(parseInt(req.params.id))
     service.saveUNQfy(unqfy)
 
+    loggly.log("Info", `Playlist deleted from Unqfy`)
     res.status(204).json('OK')
 })
 

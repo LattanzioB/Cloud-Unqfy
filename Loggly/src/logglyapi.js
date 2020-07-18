@@ -10,7 +10,7 @@ const {
   InvalidJsonError
 } = require("./APIError");
 const { ErrorHandler } = require("./ErrorHandler");
-let { LogglyModel } = requiere("./models"); 
+let { LogglyModel } = require("./model"); 
 let port = process.env.PORT || 8082; // set our port
 let bodyParser = require("body-parser");
 
@@ -25,16 +25,38 @@ try {
 
 
 
-let logglyModel = new LogglyModel
+let logglyModel = new LogglyModel()
   
 
 router.post("/newLog/", function(req, res) {
-    
-    logglyModel.log(req.query.status, req.query.message)
+    console.log("llegue newLog")
+    logglyModel.log(req.query.status, req.query.message);
     
   
     res.status(200).json("OK");
   });
+
+
+  router.post("/newApiLog/", function(req, res) {
+    console.log("llegue post newApiLog")
+    logglyModel.log(req.body.status, req.body.message);
+    res.status(200).json("OK");
+  });
+
+
+router.post("/activate", function(req, res) {
+
+  logglyModel.activate();
+
+  res.status(204).json("OK");
+});
+
+router.post("/deactivate", function(req, res) {
+
+  logglyModel.deactivate();
+
+  res.status(204).json("OK");
+});
 
 
 app.use("/api", router);
