@@ -14,7 +14,6 @@ let { LogglyModel } = require("./model");
 let port = process.env.PORT || 8082; // set our port
 let bodyParser = require("body-parser");
 
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
 try {
@@ -27,6 +26,10 @@ try {
 
 let logglyModel = new LogglyModel()
   
+router.get("/statusCheck/", function(req, res) {
+  res.json({ message: "funcionando" });
+});
+
 
 router.post("/newLog/", function(req, res) {
     console.log("llegue newLog")

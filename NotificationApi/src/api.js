@@ -25,7 +25,7 @@ try {
 
 let notify = new Notification();
 
-router.get("/", function(req, res) {
+router.get("/statusCheck/", function(req, res) {
   res.json({ message: "funcionando" });
 });
 

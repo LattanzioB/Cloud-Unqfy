@@ -1,3 +1,4 @@
 node_modules/
 .npm
 data.json
+Monitoreo-Slack/src/url.json

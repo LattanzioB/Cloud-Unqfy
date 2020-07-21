@@ -38,6 +38,11 @@ try {
 }
 
 
+router.get("/statusCheck/", function(req, res) {
+    res.json({ message: "funcionando" });
+  });
+  
+
 router.get('/idArtist/:id', function(req, res) {
     try {
         console.log(req.params.id);

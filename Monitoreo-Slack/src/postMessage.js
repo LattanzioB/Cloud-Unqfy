@@ -1,21 +1,17 @@
+const data = require('./url.json')
 const rp = require('request-promise');
 
+class SlackClient{
 
-
-class Monitoreo{
-
-  log(_status, _message) {
-    console.log("llegue")
+  postMessage(text){
     const options = {
-    url: `https://hooks.slack.com/services/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`,
-    qs: {
-        status: _status,
-        message: _message
-        }
+    url: data.url,
+    body: {
+        "text": text 
+      },
+    json: true 
     }
-    rp.post(options);
+    rp.post(options).then(res => console.log(res));
   }
 
 }
-
-//
