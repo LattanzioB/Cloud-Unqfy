@@ -1,0 +1,17 @@
+{
+  "name": "monitoreo-slack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/service.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-cron": "^2.0.3",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5"
+  }
+}
