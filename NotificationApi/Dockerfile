@@ -3,13 +3,15 @@ FROM node:13
 # A partir de esta imagen se ejecutarán los comandos de abajo creando una nueva imagen.
 
 # Configura variables de entorno necesariar para correr node
-ENV NODE_ENV=development
+#no
+ENV NODE_ENV=development 
+#no
 ENV DEBUG=true
 
 # Crea un directorio y nos movemos ahí
 WORKDIR /appNotify
 
-# Copia el package.json package-lock.json en /home/node/my_node_app
+# Copia el package.json package-lock.json
 COPY package.json ./
 COPY package-lock.json ./
 
@@ -24,9 +26,11 @@ COPY . .
 
 # Le da permisos al usuario node para escribir en /home/node/my_node_app
 # Como comentario, notar que el comando RUN nos permite ejecutar culquier comando bash valido.
+#no
 RUN chown node:users /home/node/
 
 # Habilita el usuario node. Por defecto, los containers corren los comandos con el usuario root
+#no
 USER node
 
 # Comando por defecto sino se provee uno al hacer docker run

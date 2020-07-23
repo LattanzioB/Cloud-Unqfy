@@ -3,8 +3,8 @@ const promisify = require('util').promisify;
 const {google} = require('googleapis');
 const readFile = promisify(fs.readFile)
 
-const CREDENTIALS_PATH = 'recursos_para_gmail_api/send-mail-example/credentials.json';
-const TOKEN_PATH = 'recursos_para_gmail_api/send-mail-example/token.json';
+const CREDENTIALS_PATH = 'src/recursos_para_gmail_api/send-mail-example/credentials.json';
+const TOKEN_PATH = 'src/recursos_para_gmail_api/send-mail-example/token.json';
 
 
 function getGmailClient() {
