@@ -5,7 +5,7 @@ class LogglyClient{
     log(_status, _message) {
         console.log("llegue")
         const options = {
-        url: `http://localhost:8082/api/newLog/`,
+        url: `http://172.20.0.22:8082/api/newLog/`,
         qs: {
             status: _status,
             message: _message
@@ -17,7 +17,7 @@ class LogglyClient{
     activate(){
         console.log("llegue")
         const options = {
-        url: `http://localhost:8082/api/activate/`
+        url: `http://172.20.0.22:8082/api/activate/`
         }
         rp.post(options);
     }
@@ -25,7 +25,7 @@ class LogglyClient{
     deactivate(){
         console.log("llegue")
         const options = {
-        url: `http://localhost:8082/api/deactivate/`
+        url: `http://172.20.0.22:8082/api/deactivate/`
         }
         rp.post(options);
     }

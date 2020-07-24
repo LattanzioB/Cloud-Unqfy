@@ -4,7 +4,7 @@ class NotifyClient {
   // eslint-disable-next-line class-methods-use-this
   enviar(listaDeMails, _subject, _message) {
     const options = {
-      url: `http://localhost':8081/api/notify/`,
+      url: `http://172.20.0.23:8081/api/notify/`,
       qs: {
         mails: listaDeMails,
         subject: _subject,
@@ -19,7 +19,7 @@ class NotifyClient {
   notify(_artistId, _subject, _message) {
     console.log("llegue")
     const options = {
-      url: `http://localhost':8081/api/notify/`,
+      url: `http://172.20.0.23:8081/api/notify/`,
       qs: {
         artistId: _artistId,
         subject: _subject,
@@ -31,7 +31,7 @@ class NotifyClient {
 
   deleteArtist(_artistId) {
     const options = {
-      url: `http://localhost':8081/api/subscriptions/`,
+      url: `http://172.20.0.23:8081/api/subscriptions/`,
       qs: {
         artistId: _artistId,
       }

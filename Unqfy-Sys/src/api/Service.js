@@ -37,6 +37,9 @@ try {
     console.log(e);
 }
 
+const { UNQfy } = require('../unqfy');
+
+const unqfy = new UNQfy()
 
 router.get("/statusCheck/", function(req, res) {
     res.json({ message: "funcionando" });
@@ -47,7 +50,7 @@ router.get('/idArtist/:id', function(req, res) {
     try {
         console.log(req.params.id);
         
-        const artist = service.getUNQfy().getArtistById(req.params.id)
+        const artist = unqfy.getArtistById(req.params.id)
         let artistJson = artist.toJson()
         res.status(200).json(artistJson)
     } catch(e){
@@ -65,8 +68,8 @@ router.get('/', function(req, res) {
 router.get('/artists/', function(req, res) {
     try {
         const artists = req.query.name ?
-            service.getUNQfy().findAllArtistByName(req.query.name) :
-            service.getUNQfy().getAllArtist();
+            unqfy.findAllArtistByName(req.query.name) :
+            unqfy.getAllArtist();
 
         let artistJson = artists.map(artist => artist.toJson())
         res.status(200).json(artistJson)
@@ -77,7 +80,7 @@ router.get('/artists/', function(req, res) {
 
 router.get('/artists/:id', function(req, res) {
     try {
-        const artist = service.getUNQfy().getArtistById(parseInt(req.params.id))
+        const artist = unqfy.getArtistById(parseInt(req.params.id))
         let artistJson = artist.toJson()
         res.status(200).json(artistJson)
 
@@ -89,14 +92,16 @@ router.get('/artists/:id', function(req, res) {
 
 router.post('/artists/', function(req, res, next) {
     try {
-        const unqfy = service.getUNQfy()
         const artists = unqfy.addArtist(req.body)
         let artistJson = artists.toJson()
-        service.saveUNQfy(unqfy)
 
         loggly.log("info", `New Artist ${req.body.name} is now on Unqfy`)
         res.status(201).json(artistJson)
     } catch (e) {
+        console.log("imprimiendoError");
+        
+        console.log(e);
+        
 
         if (e instanceof ErrorParametrosInsuficientes) {
             next(new BadRequestError());
@@ -110,9 +115,7 @@ router.post('/artists/', function(req, res, next) {
 
 router.delete('/artists/:id', function(req, res, next) {
     try {
-        const unqfy = service.getUNQfy()
         unqfy.deleteArtist(parseInt(req.params.id));
-        service.saveUNQfy(unqfy)
         notify.deleteArtist(parseInt(req.params.id))
         loggly.log("info", `Artist deleted from Unqfy`)
         res.status(204).json('OK')
@@ -125,10 +128,8 @@ router.delete('/artists/:id', function(req, res, next) {
 })
 
 router.put('/artists/:id', function(req, res) {
-    const unqfy = service.getUNQfy()
     const artist = unqfy.updateArtist(parseInt(req.params.id), req.body);
     let artistJson = artist.toJson()
-    service.saveUNQfy(unqfy)
     loggly.log("info", `Artist ${req.body.name} modified on Unqfy`)
     res.status(200).json(artistJson)
 
@@ -136,7 +137,6 @@ router.put('/artists/:id', function(req, res) {
 
 router.get('/tracks/:id/lyrics/', function(req, res) {
     try {
-        const unqfy = service.getUNQfy()
         const lyrics = unqfy.getLyrics(parseInt(req.params.id), MusicMatchClient);
         const trackName = unqfy.getTrackById(parseInt(req.params.id)).name
 
@@ -159,8 +159,8 @@ router.get('/albums/', function(req, res) {
     try {
 
         const albums = req.query.name ?
-            service.getUNQfy().findAllAlbumsByName(req.query.name) :
-            service.getUNQfy().findAllAlbums();
+            unqfy.findAllAlbumsByName(req.query.name) :
+            unqfy.findAllAlbums();
 
         let albumJson = albums.map(album => album.toJson())
 
@@ -176,7 +176,7 @@ router.get('/albums/', function(req, res) {
 router.get('/albums/:id', function(req, res, next) {
     const albumId = req.params.id
     try {
-        const album = service.getUNQfy().getAlbumById(albumId);
+        const album = unqfy.getAlbumById(albumId);
         let albumJson = album.toJson();
         res.status(200).json(albumJson)
 
@@ -187,14 +187,12 @@ router.get('/albums/:id', function(req, res, next) {
 
 router.post('/albums/', function(req, res, next) {
     try {
-        const unqfy = service.getUNQfy()
         const album = unqfy.addAlbum(req.body)
         let albumJson = album.toJson()
         console.log("IMPORTA");
 
         console.log(albumJson);
 
-        service.saveUNQfy(unqfy)
         notify.notify(req.body.artistId,
             `New Album!`,
             `One of your favorite artist released a new Album called ${req.body.name}, 
@@ -222,10 +220,8 @@ router.patch('/albums/:id', function(req, res, next) {
         const albumId = req.params.id;
         const year = req.body.year;
         console.log(albumId, year)
-        const unqfy = service.getUNQfy()
         const album = unqfy.changeAlbumYear(Number(albumId), year);
         let albumJson = album.toJson()
-        service.saveUNQfy(unqfy)
 
         loggly.log("info", `Album ${req.body.name} modified on Unqfy`)
 
@@ -238,9 +234,7 @@ router.patch('/albums/:id', function(req, res, next) {
 
 router.delete('/albums/:id', function(req, res, next) {
     try {
-        const unqfy = service.getUNQfy()
         unqfy.deleteAlbum(parseInt(req.params.id));
-        service.saveUNQfy(unqfy)
 
         loggly.log("info", `Album deleted from Unqfy`)
 
@@ -252,7 +246,7 @@ router.delete('/albums/:id', function(req, res, next) {
 
 
 // router.post('/playlists/', function(req, res) {
-//     const unqfy = service.getUNQfy()
+//     const unqfy = unqfy
 //     const playList = unqfy.createPlaylist(req.body);
 //     let playListJson = playList.toJson()
 //     service.saveUNQfy(unqfy)
@@ -266,7 +260,6 @@ router.post('/playlists/', function(req, res) {
     if (req.body.name && req.body.tracks) {
         console.log("primer if");
 
-        const unqfy = service.getUNQfy()
         const playList = unqfy.createPlaylistByTracks(req.body);
         let playListJson = playList.toJson()
         let duration = unqfy.trackListDuration(playList.tracks)
@@ -279,7 +272,6 @@ router.post('/playlists/', function(req, res) {
             tracks: playList.tracks
         }
 
-        service.saveUNQfy(unqfy)
 
         loggly.log("info", `New Playlist ${req.body.name} is now on Unqfy`)
         res.status(201).json(playlist)
@@ -287,10 +279,8 @@ router.post('/playlists/', function(req, res) {
     } else {
         console.log("else");
 
-        const unqfy = service.getUNQfy()
         const playList = unqfy.createPlaylist(req.body);
         let playListJson = playList.toJson()
-        service.saveUNQfy(unqfy)
 
         res.status(201).json(playListJson)
     }
@@ -302,7 +292,6 @@ router.post('/playlists/', function(req, res) {
 
 router.get('/playlists/:id', function(req, res) {
     try {
-        const unqfy = service.getUNQfy()
         const playList = unqfy.getPlaylistById(parseInt(req.params.id))
 
         let playListJson = playList.toJson()
@@ -316,7 +305,6 @@ router.get('/playlists/:id', function(req, res) {
 
 router.get('/playlistsP/', function(req, res) {
     try {
-        const unqfy = service.getUNQfy()
         const playList = unqfy.getPlaylistByIdAndParams(req.query.name, req.query.durationLT, req.query.durationGT)
 
         res.status(200).json(playList)
@@ -327,9 +315,7 @@ router.get('/playlistsP/', function(req, res) {
 });
 
 router.delete('/playlists/:id', function(req, res) {
-    const unqfy = service.getUNQfy()
     const playList = unqfy.deletePlayList(parseInt(req.params.id))
-    service.saveUNQfy(unqfy)
 
     loggly.log("Info", `Playlist deleted from Unqfy`)
     res.status(204).json('OK')

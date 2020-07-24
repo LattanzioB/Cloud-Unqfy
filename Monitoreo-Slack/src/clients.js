@@ -5,7 +5,7 @@ class MultipleClients{
     loggly() {
         console.log("llegue loggly")
         const options = {
-        url: `http://localhost:8082/api/statusCheck/`,
+        url: `http://172.20.0.22:8082/api/statusCheck/`,
         json: true
         }
         return rp.get(options).then(res =>(res.message))
@@ -14,7 +14,7 @@ class MultipleClients{
     notification() {
         console.log("llegue notification")
         const options = {
-        url: `http://localhost:8081/api/statusCheck/`,
+        url: `http://172.20.0.23:8081/api/statusCheck/`,
         }
         return rp.get(options).then(res =>(res.message));
     }
@@ -22,7 +22,7 @@ class MultipleClients{
     unqfy(){
         console.log("llegue unqfy")
         const options = {
-        url: `http://localhost:8080/api/statusCheck/`,
+        url: `http://172.20.0.21:8080/api/statusCheck/`,
         }
         return rp.get(options).then(res =>(res.message));
     }

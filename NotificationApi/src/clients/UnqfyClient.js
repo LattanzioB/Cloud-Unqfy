@@ -2,7 +2,7 @@ const rp = require("request-promise");
 
 exports.getOK = () => {
   const options = {
-    uri: "http://localhost:8080/api/"
+    uri: "http://172.20.0.21:8080/api/"
     // qs: {
     //     artistId: artistId,
     // },
@@ -13,7 +13,7 @@ exports.getOK = () => {
 
 exports.searchArtistId = artistId => {
   const options = {
-    uri: `http://localhost:8080/api/idArtist/${artistId}`,
+    uri: `http://172.20.0.21:8080/api/idArtist/${artistId}`,
     // qs: {
     //     name: artistName,
     // },
@@ -22,7 +22,7 @@ exports.searchArtistId = artistId => {
 
   exports.searchArtistByName = artistName => {
     const options = {
-      uri: `http://localhost:8080/api/idArtist/${artistId}`,
+      uri: `http://172.20.0.21:8080/api/idArtist/${artistId}`,
        qs: {
            name: artistName,
        },
